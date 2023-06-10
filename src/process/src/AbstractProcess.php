@@ -15,6 +15,7 @@ use Hyperf\Contract\ProcessInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Coordinator\Constants;
 use Hyperf\Coordinator\CoordinatorManager;
+use Hyperf\Coroutine\Coroutine;
 use Hyperf\Engine\Channel;
 use Hyperf\Engine\Constant;
 use Hyperf\ExceptionHandler\Formatter\FormatterInterface;
@@ -25,7 +26,6 @@ use Hyperf\Process\Event\BeforeProcessHandle;
 use Hyperf\Process\Event\PipeMessage;
 use Hyperf\Process\Exception\ServerInvalidException;
 use Hyperf\Process\Exception\SocketAcceptException;
-use Hyperf\Utils\Coroutine;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Swoole\Event;
@@ -89,7 +89,7 @@ abstract class AbstractProcess implements ProcessInterface
         for ($i = 0; $i < $num; ++$i) {
             $process = new SwooleProcess(function (SwooleProcess $process) use ($i) {
                 try {
-                    $this->event && $this->event->dispatch(new BeforeProcessHandle($this, $i));
+                    $this->event?->dispatch(new BeforeProcessHandle($this, $i));
 
                     $this->process = $process;
                     if ($this->enableCoroutine) {
@@ -100,7 +100,7 @@ abstract class AbstractProcess implements ProcessInterface
                 } catch (Throwable $throwable) {
                     $this->logThrowable($throwable);
                 } finally {
-                    $this->event && $this->event->dispatch(new AfterProcessHandle($this, $i));
+                    $this->event?->dispatch(new AfterProcessHandle($this, $i));
                     if (isset($quit)) {
                         $quit->push(true);
                     }
@@ -109,6 +109,7 @@ abstract class AbstractProcess implements ProcessInterface
                     sleep($this->restartInterval);
                 }
             }, $this->redirectStdinStdout, $this->pipeType, $this->enableCoroutine);
+            $process->setBlocking(false);
             $server->addProcess($process);
 
             if ($this->enableCoroutine) {
@@ -128,7 +129,7 @@ abstract class AbstractProcess implements ProcessInterface
 
         for ($i = 0; $i < $num; ++$i) {
             $handler = function () use ($i) {
-                $this->event && $this->event->dispatch(new BeforeCoroutineHandle($this, $i));
+                $this->event?->dispatch(new BeforeCoroutineHandle($this, $i));
                 while (true) {
                     try {
                         $this->handle();
@@ -140,7 +141,7 @@ abstract class AbstractProcess implements ProcessInterface
                         break;
                     }
                 }
-                $this->event && $this->event->dispatch(new AfterCoroutineHandle($this, $i));
+                $this->event?->dispatch(new AfterCoroutineHandle($this, $i));
             };
 
             Coroutine::create($handler);

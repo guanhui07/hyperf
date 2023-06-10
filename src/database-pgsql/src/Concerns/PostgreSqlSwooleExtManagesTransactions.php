@@ -15,6 +15,8 @@ use Closure;
 use Exception;
 use Throwable;
 
+use function Hyperf\Tappable\tap;
+
 trait PostgreSqlSwooleExtManagesTransactions
 {
     /**
@@ -179,7 +181,7 @@ trait PostgreSqlSwooleExtManagesTransactions
      */
     protected function createSavepoint()
     {
-        $this->getPdo()->exec(
+        $this->getPdo()->query(
             $this->queryGrammar->compileSavepoint('trans' . ($this->transactions + 1))
         );
     }
@@ -196,7 +198,7 @@ trait PostgreSqlSwooleExtManagesTransactions
         if ($this->causedByLostConnection($e)) {
             $this->reconnect();
 
-            $this->pdo->query('BEGIN');
+            $this->getPdo()->query('BEGIN');
         } else {
             throw $e;
         }
@@ -212,7 +214,7 @@ trait PostgreSqlSwooleExtManagesTransactions
         if ($toLevel == 0) {
             $this->getPdo()->query('ROLLBACK');
         } elseif ($this->queryGrammar->supportsSavepoints()) {
-            $this->getPdo()->exec(
+            $this->getPdo()->query(
                 $this->queryGrammar->compileSavepointRollBack('trans' . ($toLevel + 1))
             );
         }

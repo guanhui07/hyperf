@@ -13,20 +13,25 @@ namespace Hyperf\Validation;
 
 use BadMethodCallException;
 use Closure;
+use Hyperf\Collection\Arr;
 use Hyperf\Contract\MessageBag as MessageBagContract;
 use Hyperf\Contract\TranslatorInterface;
 use Hyperf\Contract\ValidatorInterface as ValidatorContract;
 use Hyperf\HttpMessage\Upload\UploadedFile;
-use Hyperf\Utils\Arr;
-use Hyperf\Utils\Fluent;
-use Hyperf\Utils\MessageBag;
-use Hyperf\Utils\Str;
+use Hyperf\Stringable\Str;
+use Hyperf\Support\Fluent;
+use Hyperf\Support\MessageBag;
 use Hyperf\Validation\Contract\ImplicitRule;
 use Hyperf\Validation\Contract\PresenceVerifierInterface;
 use Hyperf\Validation\Contract\Rule as RuleContract;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
 use Stringable;
+
+use function Hyperf\Collection\collect;
+use function Hyperf\Collection\data_get;
+use function Hyperf\Support\make;
+use function Hyperf\Tappable\tap;
 
 class Validator implements ValidatorContract
 {
@@ -493,7 +498,7 @@ class Validator implements ValidatorContract
     public function addExtensions(array $extensions)
     {
         if ($extensions) {
-            $keys = array_map('\Hyperf\Utils\Str::snake', array_keys($extensions));
+            $keys = array_map('\Hyperf\Stringable\Str::snake', array_keys($extensions));
 
             $extensions = array_combine($keys, array_values($extensions));
         }
@@ -559,7 +564,7 @@ class Validator implements ValidatorContract
     public function addReplacers(array $replacers)
     {
         if ($replacers) {
-            $keys = array_map('\Hyperf\Utils\Str::snake', array_keys($replacers));
+            $keys = array_map('\Hyperf\Stringable\Str::snake', array_keys($replacers));
 
             $replacers = array_combine($keys, array_values($replacers));
         }

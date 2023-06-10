@@ -11,9 +11,9 @@ declare(strict_types=1);
  */
 namespace HyperfTest\GrpcClient;
 
+use Hyperf\Context\ApplicationContext;
+use Hyperf\Coroutine\Channel\Pool as ChannelPool;
 use Hyperf\Di\Container;
-use Hyperf\Utils\ApplicationContext;
-use Hyperf\Utils\ChannelPool;
 use HyperfTest\GrpcClient\Stub\UserServiceClient;
 use Mockery;
 use PHPUnit\Framework\TestCase;

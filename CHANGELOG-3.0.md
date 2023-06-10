@@ -1,4 +1,346 @@
-# v3.0.6 - TBD
+# v3.0.25 - TBD
+
+# v3.0.24 - 2023-06-10
+
+## Fixed
+
+- [#5794](https://github.com/hyperf/hyperf/pull/5794) Fixed bug that `__FILE__` and `__DIR__` cannot be rewritten successfully in proxy classes.
+- [#5803](https://github.com/hyperf/hyperf/pull/5803) Fixed bug that `hyperf/http-server` cannot match psr7.
+- [#5808](https://github.com/hyperf/hyperf/pull/5808) Fixed bug that validation rules `le`、`lte`、`gt`、`gte` do not support comparison between numeric and string values.
+
+## Optimized
+
+- [#5789](https://github.com/hyperf/hyperf/pull/5789) Support `psr/http-message`.
+- [#5806](https://github.com/hyperf/hyperf/pull/5806) Merge swow server settings with config settings.
+- [#5814](https://github.com/hyperf/hyperf/pull/5814) Added function `build_sql` which be used in `QueryException`.
+
+# v3.0.23 - 2023-06-02
+
+## Added
+
+- [#5757](https://github.com/hyperf/hyperf/pull/5757) Support nacos naming signature.
+- [#5765](https://github.com/hyperf/hyperf/pull/5765) Support Full-Text Search for `database`.
+
+## Fixed
+
+- [#5782](https://github.com/hyperf/hyperf/pull/5782) Fixed bug that prometheus cannot collect histograms.
+
+## Optimized
+
+- [#5768](https://github.com/hyperf/hyperf/pull/5768) Improved `Hyperf\Command\Annotation\Command`, support set properties for command.
+- [#5780](https://github.com/hyperf/hyperf/pull/5780) Convert carrier key to string in `Zipkin\Propagation\Map`.
+
+# v3.0.22 - 2023-05-27
+
+## Added
+
+- [#5760](https://github.com/hyperf/hyperf/pull/5760) Added namespace for functions of `hyperf/translation`.
+- [#5761](https://github.com/hyperf/hyperf/pull/5761) Added `Hyperf\Coordinator\Timer::until()`.
+
+## Optimized
+
+- [#5741](https://github.com/hyperf/hyperf/pull/5741) Added deprecated comments to `Hyperf\DB\MySQLConnection`.
+- [#5702](https://github.com/hyperf/hyperf/pull/5702) Optimized the code of `Hyperf\Metric\Adapter\Prometheus\Redis` which allowed to rewrite the prefix about redis keys.
+- [#5762](https://github.com/hyperf/hyperf/pull/5762) Use non-blocking mode for swoole process by default.
+
+# v3.0.21 - 2023-05-18
+
+## Added
+
+- [#5721](https://github.com/hyperf/hyperf/pull/5721) Added `exception` property to Request Lifecycle Events.
+- [#5723](https://github.com/hyperf/hyperf/pull/5723) Support `Swoole 5 PgSQL` for `hyperf/db`.
+- [#5725](https://github.com/hyperf/hyperf/pull/5725) Support `Swoole 4 PgSQL` for `hyperf/db`.
+- [#5731](https://github.com/hyperf/hyperf/pull/5731) Added `Arr::hasAny()`.
+
+## Fixed
+
+- [#5726](https://github.com/hyperf/hyperf/pull/5726) [#5730](https://github.com/hyperf/hyperf/pull/5730) Fixed bug that pgsql cannot init when using pgsql-swoole.
+
+## Optimized
+
+- [#5718](https://github.com/hyperf/hyperf/pull/5718) Optimized the code and added some test cases for `view-engine`.
+- [#5719](https://github.com/hyperf/hyperf/pull/5719) Optimized the code of `metric` and added some unit cases.
+- [#5720](https://github.com/hyperf/hyperf/pull/5720) Optimized the code of `Hyperf\Metric\Listener\OnPipeMessage` to avoid message block.
+
+# v3.0.20 - 2023-05-12
+
+## Added
+
+- [#5707](https://github.com/hyperf/hyperf/pull/5707) Added `Hyperf\Config\config` function.
+- [#5711](https://github.com/hyperf/hyperf/pull/5711) Added `Arr::mapWithKeys()`.
+- [#5715](https://github.com/hyperf/hyperf/pull/5715) Support http request lifecycle events.
+
+## Fixed
+
+- [#5709](https://github.com/hyperf/hyperf/pull/5709) Fixed bug that the error message is wrong when the logger group not found.
+- [#5713](https://github.com/hyperf/hyperf/pull/5713) Support Server instance as default.
+
+## Optimized
+
+- [#5716](https://github.com/hyperf/hyperf/pull/5716) Support CoroutineServer for SuperGlobals.
+
+# v3.0.19 - 2023-05-06
+
+## Fixed
+
+- [#5679](https://github.com/hyperf/hyperf/pull/5679) Fixed bug that the type of `$timeout` in `#[Task]` don't match `TaskAspect`.
+- [#5684](https://github.com/hyperf/hyperf/pull/5684) Fixed bug that blade view engine cannot work when using break statement.
+
+## Added
+
+- [#5680](https://github.com/hyperf/hyperf/pull/5680) Support store context when using `rpc-multiplex`.
+- [#5695](https://github.com/hyperf/hyperf/pull/5695) Added creation and update datetime columns.
+- [#5699](https://github.com/hyperf/hyperf/pull/5699) Added `Model::resolveRelationUsing()` which you can set dynamic relation for model.
+
+## Optimized
+
+- [#5694](https://github.com/hyperf/hyperf/pull/5694) Remove `hyperf/utils` from `hyperf/rpc`.
+- [#5696](https://github.com/hyperf/hyperf/pull/5696) Use `Hyperf\Coroutine\Coroutine::sleep()` instead of `Swoole\Coroutine::sleep()`.
+
+# v3.0.18 - 2023-04-26
+
+## Added
+
+- [#5672](https://github.com/hyperf/hyperf/pull/5672) Added some helper functions in `hyperf/support`.
+
+## Fixed
+
+- [#5662](https://github.com/hyperf/hyperf/pull/5662) Fixed bug that `pgsql-swoole` cannot throw exceptions when statement execution failed.
+
+## Optimized
+
+- [#5660](https://github.com/hyperf/hyperf/pull/5660) Split `hyperf/codec` from `hyperf/utils`.
+- [#5663](https://github.com/hyperf/hyperf/pull/5663) Split `hyperf/serializer` from `hyperf/utils`.
+- [#5666](https://github.com/hyperf/hyperf/pull/5666) Split `Packers` to `hyperf/codec`.
+- [#5668](https://github.com/hyperf/hyperf/pull/5668) Split `hyperf/support` from `hyperf/utils`.
+- [#5670](https://github.com/hyperf/hyperf/pull/5670) Split `hyperf/code-parser` from `hyperf/utils`.
+- [#5671](https://github.com/hyperf/hyperf/pull/5671) Use `Hyperf\Coroutine\Channel\Pool` instead of `Hyperf\Utils\ChannelPool`.
+- [#5674](https://github.com/hyperf/hyperf/pull/5674) Instead of `classes` and `functions` of `Hyperf\Utils`.
+
+# v3.0.17 - 2023-04-19
+
+## Fixed
+
+- [#5642](https://github.com/hyperf/hyperf/pull/5642) Fixed bug that the model cache cannot be created when using `find many` to get non-exists models.
+- [#5643](https://github.com/hyperf/hyperf/pull/5643) Fixed bug that the empty caches cannot be used for `Model::findManyFromCache()`.
+- [#5649](https://github.com/hyperf/hyperf/pull/5649) Fixed bug init table collector cannot work for coroutine style server.
+
+## Added
+
+- [#5634](https://github.com/hyperf/hyperf/pull/5634) Added `Hyperf\Stringable\str()` helper function.
+- [#5639](https://github.com/hyperf/hyperf/pull/5639) Added `Redis::pipeline()` and `Redis::transaction()` support.
+- [#5641](https://github.com/hyperf/hyperf/pull/5641) Support deeply nested cache relations for `model-cache`.
+- [#5646](https://github.com/hyperf/hyperf/pull/5646) Added `PriorityDefinition` to sort dependencies.
+
+## Optimized
+
+- [#5634](https://github.com/hyperf/hyperf/pull/5634) Use `Hyperf\Stringable\Str` instead of `Hyperf\Utils\Str`.
+- [#5636](https://github.com/hyperf/hyperf/pull/5636) Reduce kafka first start time and handle stop consumer logic
+- [#5648](https://github.com/hyperf/hyperf/pull/5648) Removed requirement `hyperf/utils` from `hyperf/guzzle`.
+
+# v3.0.16 - 2023-04-12
+
+## Fixed
+
+- [#5627](https://github.com/hyperf/hyperf/pull/5627) Fixed issue where coroutine context was not destroyed in `Hyperf\Context\Context::destroy` method.
+
+## Optimized
+
+- [#5616](https://github.com/hyperf/hyperf/pull/5616) Split `ApplicationContext` from `hyperf/utils` to `hyperf/context`.
+- [#5617](https://github.com/hyperf/hyperf/pull/5617) Removed the requirement `hyperf/guzzle` from `hyperf/consul`.
+- [#5618](https://github.com/hyperf/hyperf/pull/5618) Support to set the default router for swagger.
+- [#5619](https://github.com/hyperf/hyperf/pull/5619) [#5620](https://github.com/hyperf/hyperf/pull/5620) Split `hyperf/coroutine` from `hyperf/utils`.
+- [#5621](https://github.com/hyperf/hyperf/pull/5621) Use `Hyperf\Context\ApplicationContext` instead of `Hyperf\Utils\ApplicationContext`.
+- [#5622](https://github.com/hyperf/hyperf/pull/5622) Split `CoroutineProxy` from `hyperf/utils` to `hyperf/context`.
+- [#5623](https://github.com/hyperf/hyperf/pull/5623) Use `Hyperf\Coroutine\Coroutine` instead of `Hyperf\Utils\Coroutine`.
+- [#5624](https://github.com/hyperf/hyperf/pull/5624) Split Channel utils from `hyperf/utils` to `hyperf/coroutine`.
+- [#5629](https://github.com/hyperf/hyperf/pull/5629) Refactor `Hyperf\Utils\Arr` that let it extends `Hyperf\Collection\Arr`.
+
+# v3.0.15 - 2023-04-07
+
+## Added
+
+- [#5606](https://github.com/hyperf/hyperf/pull/5606) Added `server.options.send_channel_capacity` to control whether to use safe socket.
+
+## Optimized
+
+- [#5593](https://github.com/hyperf/hyperf/pull/5593) [#5598](https://github.com/hyperf/hyperf/pull/5598) Use `Hyperf\Collection\Collection` instead of `Hyperf\Utils\Collection`.
+- [#5594](https://github.com/hyperf/hyperf/pull/5594) Use `Hyperf\Collection\Arr` instead of `Hyperf\Utils\Arr`.
+- [#5596](https://github.com/hyperf/hyperf/pull/5596) Split `hyperf/pipeline` from `hyperf/utils`.
+- [#5599](https://github.com/hyperf/hyperf/pull/5599) Use Hyperf\Pipeline\Pipeline instead of Hyperf\Utils\Pipeline。
+
+# v3.0.14 - 2023-04-01
+
+## Fixed
+
+- [#5578](https://github.com/hyperf/hyperf/pull/5578) Fixed bug that unable to serialize `Channel` in `Crontab`.
+- [#5579](https://github.com/hyperf/hyperf/pull/5579) Fixed bug that `crontab:run` cannot work.
+
+## Optimized
+
+- [#5572](https://github.com/hyperf/hyperf/pull/5572) Update Http Server to use new WritableConnection implementation.
+- [#5577](https://github.com/hyperf/hyperf/pull/5577) Split `hyperf/collection` from `hyperf/utils`.
+- [#5580](https://github.com/hyperf/hyperf/pull/5580) Split `hyperf/conditionable` and `hyperf/tappable` from `hyperf/utils`.
+- [#5585](https://github.com/hyperf/hyperf/pull/5585) Removed the requirement `consul` from `service-governance`.
+
+# v3.0.13 - 2023-03-26
+
+## Added
+
+- [#5561](https://github.com/hyperf/hyperf/pull/5561) Added setTimer support for `hyperf/kafka`.
+- [#5562](https://github.com/hyperf/hyperf/pull/5562) Added method `Query\Builder::upsert()`.
+- [#5563](https://github.com/hyperf/hyperf/pull/5563) Added `running channel` to make sure all crontab tasks handled successfully.
+
+## Optimized
+
+- [#5544](https://github.com/hyperf/hyperf/pull/5554) Cancel `grpc-server`'s dependency on `hyperf/rpc`.
+- [#5550](https://github.com/hyperf/hyperf/pull/5550) Optimized code for crontab parser and coordinator timer.
+- [#5566](https://github.com/hyperf/hyperf/pull/5566) Optimized the type hint to `nullable` for schemas which generated by `cmd`.
+- [#5569](https://github.com/hyperf/hyperf/pull/5569) Simplify RunCommand's dependencies.
+
+# v3.0.12 - 2023-03-20
+
+## Added
+
+- [#4112](https://github.com/hyperf/hyperf/pull/4112) Added `kafka.default.enable` to control the consumer start or not.
+- [#5533](https://github.com/hyperf/hyperf/pull/5533) [#5535](https://github.com/hyperf/hyperf/pull/5535) Added `client` & `socket` config for kafka.
+- [#5536](https://github.com/hyperf/hyperf/pull/5536) Added `hyperf/http2-client`.
+- [#5538](https://github.com/hyperf/hyperf/pull/5538) Support stream call for http2 client.
+- [#5511](https://github.com/hyperf/hyperf/pull/5511) Support GRPC services which can easily to registry and discovery.
+- [#5543](https://github.com/hyperf/hyperf/pull/5543) Support nacos grpc which used to listen config changed event.
+- [#5545](https://github.com/hyperf/hyperf/pull/5545) Added streaming test cases for http2 client.
+- [#5546](https://github.com/hyperf/hyperf/pull/5546) Support grpc streaming for config-nacos.
+
+## Optimized
+
+- [#5539](https://github.com/hyperf/hyperf/pull/5539) Optimized code for `AMQPConnection` to support the latest `php-amqplib`.
+- [#5528](https://github.com/hyperf/hyperf/pull/5528) Optimized hot reload for `aspects`.
+- [#5541](https://github.com/hyperf/hyperf/pull/5541) Improve FactoryResolver.
+
+# v3.0.11 - 2023-03-15
+
+## Added
+
+- [#5499](https://github.com/hyperf/hyperf/pull/5499) Support `enum` for `hyperf/constants`.
+- [#5508](https://github.com/hyperf/hyperf/pull/5508) Added `Hyperf\Rpc\Protocol::getNormalizer`.
+- [#5509](https://github.com/hyperf/hyperf/pull/5509) Auto register `normalizer` for `json-rpc`.
+- [#5513](https://github.com/hyperf/hyperf/pull/5513) Use default normalizer for `rpc-multiplex` and use `protocol.normalizer` for `rpc-server`.
+- [#5518](https://github.com/hyperf/hyperf/pull/5518) Added `SwooleConnection::getSocket` to get swoole response.
+- [#5520](https://github.com/hyperf/hyperf/pull/5520) Added `Coroutine::stats()` and `Coroutine::exists()`.
+- [#5525](https://github.com/hyperf/hyperf/pull/5525) Added `kafka.default.consume_timeout` to control the consumer for consuming messages.
+- [#5526](https://github.com/hyperf/hyperf/pull/5526) Added `Hyperf\Kafka\AbstractConsumer::isEnable()` to control the kafka consumer start or not.
+
+## Fixed
+
+- [#5519](https://github.com/hyperf/hyperf/pull/5519) Fixed bug that worker cannot exit caused by kafka `producer->loop()`.
+- [#5523](https://github.com/hyperf/hyperf/pull/5523) Fixed bug that process stopped when kafka rebalance.
+
+## Optimized
+
+- [#5510](https://github.com/hyperf/hyperf/pull/5510) Allow developers to replace the `normalizer` of `RPC Client` themselves.
+- [#5525](https://github.com/hyperf/hyperf/pull/5525) Running in an independent coroutine when consume kafka message. 
+
+# v3.0.10 - 2023-03-11
+
+## Fixed
+
+- [#5497](https://github.com/hyperf/hyperf/pull/5497) Fixed bug that `ConfigChanged` cannot dispatched when using `apollo`.
+
+## Added
+
+- [#5491](https://github.com/hyperf/hyperf/pull/5491) Added `charAt` method to both `Str` and `Stringable`.
+- [#5503](https://github.com/hyperf/hyperf/pull/5503) Added `Hyperf\Contract\JsonDeSerializable`.
+- [#5504](https://github.com/hyperf/hyperf/pull/5504) Added `Hyperf\Utils\Serializer\JsonDeNormalizer`.
+
+## Optimized
+
+- [#5493](https://github.com/hyperf/hyperf/pull/5493) Optimized code for service registration which support nacos `1.x` and `2.x`.
+- [#5494](https://github.com/hyperf/hyperf/pull/5494) [#5501](https://github.com/hyperf/hyperf/pull/5501) Do not replace `Handler` when `native-curl` is supported.
+
+## Changed
+
+- [#5492](https://github.com/hyperf/hyperf/pull/5492) Renamed `Hyperf\DbConnection\Listener\CreatingListener` to `Hyperf\DbConnection\Listener\InitUidOnCreatingListener`.
+
+# v3.0.9 - 2023-03-05
+
+## Added
+
+- [#5467](https://github.com/hyperf/hyperf/pull/5467) Support `Google\Rpc\Status` for `GRPC`.
+- [#5472](https://github.com/hyperf/hyperf/pull/5472) Support `ulid` and `uuid` for Model.
+- [#5476](https://github.com/hyperf/hyperf/pull/5476) Added ArrayAccess to Stringable.
+- [#5478](https://github.com/hyperf/hyperf/pull/5478) Added isMatch method to Str and Stringable helpers.
+
+## Optimized
+
+- [#5469](https://github.com/hyperf/hyperf/pull/5469) Ensure that the connection must be reset the next time after broken.
+
+# v3.0.8 - 2023-02-26
+
+## Fixed
+
+- [#5433](https://github.com/hyperf/hyperf/pull/5433) [#5438](https://github.com/hyperf/hyperf/pull/5438) Fixed bug that the persistent service no need to send heartbeat.
+- [#5464](https://github.com/hyperf/hyperf/pull/5464) Fixed bug that swagger server cannot work when using async style server.
+
+## Added
+
+- [#5434](https://github.com/hyperf/hyperf/pull/5434) Support UDP Server for Swow.
+- [#5444](https://github.com/hyperf/hyperf/pull/5444) Added `GenSchemaCommand` to generate schemas for swagger.
+- [#5451](https://github.com/hyperf/hyperf/pull/5451) Added method `appends($attributes)` to model collections.
+- [#5453](https://github.com/hyperf/hyperf/pull/5453) Added missing methods `put()` and `patch()` to testing HTTP client.
+- [#5454](https://github.com/hyperf/hyperf/pull/5454) Added method `Hyperf\Grpc\Parser::statusFromResponse`.
+- [#5459](https://github.com/hyperf/hyperf/pull/5459) Added some methods of `uuid` and `ulid` for `Str` and `Stringable`.
+
+## Optimized
+
+- [#5437](https://github.com/hyperf/hyperf/pull/5437) Remove unnecessary `if `statement in `Str::length`.
+- [#5439](https://github.com/hyperf/hyperf/pull/5439) Improve `Arr::shuffle`.
+
+# v3.0.7 - 2023-02-18
+
+## Added
+
+- [#5042](https://github.com/hyperf/hyperf/pull/5402) Added `swagger.scan.paths` to rewrite `scan paths` for swagger.
+- [#5403](https://github.com/hyperf/hyperf/pull/5403) Support swoole server settings for swow server.
+- [#5404](https://github.com/hyperf/hyperf/pull/5404) Support multiport server for swagger.
+- [#5406](https://github.com/hyperf/hyperf/pull/5406) Added `mixin` method to `Hyperf\Database\Model\Builder`.
+- [#5407](https://github.com/hyperf/hyperf/pull/5407) Support HTTP methods `Delete` and `Options` for swagger.
+- [#5409](https://github.com/hyperf/hyperf/pull/5409) Adds `methods` for `Query\Builder` and `Paginator`.
+- [#5414](https://github.com/hyperf/hyperf/pull/5414) Added `clone` method to `Hyperf\Database\Model\Builder`.
+- [#5418](https://github.com/hyperf/hyperf/pull/5418) Added `ConfigChanged` event to `config-center`.
+- [#5429](https://github.com/hyperf/hyperf/pull/5429) Added `access_key` and `access_secret` which used to connect aliyun nacos.
+
+## Fixed
+
+- [#5405](https://github.com/hyperf/hyperf/pull/5405) Fixed get local ip error when IPv6 exists.
+- [#5417](https://github.com/hyperf/hyperf/pull/5417) Fixed bug that database-pgsql does not support migration.
+- [#5421](https://github.com/hyperf/hyperf/pull/5421) Fixed database about boolean types for where in the json type.
+- [#5428](https://github.com/hyperf/hyperf/pull/5428) Fixed bug that metric middleware cannot work well when encountered an exception.
+- [#5424](https://github.com/hyperf/hyperf/pull/5424) Fixed bug that migrator cannot work when using `PHP8.2`.
+
+## Optimized
+
+- [#5411](https://github.com/hyperf/hyperf/pull/5411) Optimized the code of `WebSocketHandeShakeException` which should inheritance `BadRequestHttpException`.
+- [#5419](https://github.com/hyperf/hyperf/pull/5419) Optimized the code of `RPN`.
+- [#5422](https://github.com/hyperf/hyperf/pull/5422) Enable swagger by default when installed swagger component.
+
+# v3.0.6 - 2023-02-12
+
+## Fixed
+
+- [#5361](https://github.com/hyperf/hyperf/pull/5361) Fixed bug that the current service XXX is persistent service, can't register ephemeral instance.
+- [#5382](https://github.com/hyperf/hyperf/pull/5382) Fixed bug that mix-subscriber cannot work caused by the empty auth.
+- [#5386](https://github.com/hyperf/hyperf/pull/5386) Fixed bug that non-existing method `exec` called by `SwoolePostgresqlClient`.
+- [#5394](https://github.com/hyperf/hyperf/pull/5394) Fixed bug that `hyperf/config-apollo` cannot work.
+
+## Added
+
+- [#5366](https://github.com/hyperf/hyperf/pull/5366) Added `forceDeleting` event to `hyperf/database`.
+- [#5373](https://github.com/hyperf/hyperf/pull/5373) Support server settings for `SwowServer`.
+- [#5376](https://github.com/hyperf/hyperf/pull/5376) Support coroutine server stats for `hyperf/metric`.
+- [#5379](https://github.com/hyperf/hyperf/pull/5379) Added log records when nacos heartbeat failed.
+- [#5389](https://github.com/hyperf/hyperf/pull/5389) Added swagger support.
+- [#5395](https://github.com/hyperf/hyperf/pull/5395) Support validation for swagger.
+- [#5397](https://github.com/hyperf/hyperf/pull/5397) Support all swagger annotations.
 
 # v3.0.5 - 2023-02-05
 

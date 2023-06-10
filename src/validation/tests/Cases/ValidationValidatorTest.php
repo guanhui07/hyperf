@@ -14,14 +14,14 @@ namespace HyperfTest\Validation\Cases;
 use Carbon\Carbon;
 use DateTime;
 use DateTimeImmutable;
+use Hyperf\Collection\Arr;
+use Hyperf\Context\ApplicationContext;
 use Hyperf\Contract\TranslatorInterface as TranslatorContract;
 use Hyperf\Di\Container;
 use Hyperf\Di\Definition\DefinitionSourceInterface;
 use Hyperf\HttpMessage\Upload\UploadedFile;
 use Hyperf\Translation\ArrayLoader;
 use Hyperf\Translation\Translator;
-use Hyperf\Utils\ApplicationContext;
-use Hyperf\Utils\Arr;
 use Hyperf\Validation\Contract\ImplicitRule;
 use Hyperf\Validation\Contract\PresenceVerifierInterface;
 use Hyperf\Validation\Contract\Rule;
@@ -1692,6 +1692,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertEquals(5, $v->messages()->first('items'));
 
+        $v = new Validator($trans, ['items' => '26', 'more' => 5], ['items' => 'gt:more']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['items' => 'abc', 'more' => 'abcde'], ['items' => 'gt:more']);
         $this->assertFalse($v->passes());
         $this->assertEquals(5, $v->messages()->first('items'));
@@ -1728,6 +1731,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['items' => 3, 'less' => 2], ['items' => 'numeric|lt:less']);
         $this->assertFalse($v->passes());
         $this->assertEquals(2, $v->messages()->first('items'));
+
+        $v = new Validator($trans, ['items' => '5', 'less' => 26], ['items' => 'numeric|lt:less']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['items' => 'abc', 'less' => 'ab'], ['items' => 'lt:less']);
         $this->assertFalse($v->passes());
@@ -1766,6 +1772,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertEquals(5, $v->messages()->first('items'));
 
+        $v = new Validator($trans, ['items' => '26', 'more' => 26], ['items' => 'numeric|gte:more']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['items' => 'abc', 'more' => 'abcde'], ['items' => 'gte:more']);
         $this->assertFalse($v->passes());
         $this->assertEquals(5, $v->messages()->first('items'));
@@ -1802,6 +1811,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['items' => 3, 'less' => 2], ['items' => 'numeric|lte:less']);
         $this->assertFalse($v->passes());
         $this->assertEquals(2, $v->messages()->first('items'));
+
+        $v = new Validator($trans, ['items' => 5, 'less' => '26'], ['items' => 'numeric|lte:less']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['items' => 'abc', 'less' => 'ab'], ['items' => 'lte:less']);
         $this->assertFalse($v->passes());

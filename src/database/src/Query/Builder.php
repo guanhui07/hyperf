@@ -15,6 +15,9 @@ use BadMethodCallException;
 use Closure;
 use DateTimeInterface;
 use Generator;
+use Hyperf\Collection\Arr;
+use Hyperf\Collection\Collection;
+use Hyperf\Context\ApplicationContext;
 use Hyperf\Contract\Arrayable;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Contract\PaginatorInterface;
@@ -26,13 +29,14 @@ use Hyperf\Database\Query\Grammars\Grammar;
 use Hyperf\Database\Query\Processors\Processor;
 use Hyperf\Macroable\Macroable;
 use Hyperf\Paginator\Paginator;
-use Hyperf\Utils\ApplicationContext;
-use Hyperf\Utils\Arr;
-use Hyperf\Utils\Collection;
-use Hyperf\Utils\Str;
-use Hyperf\Utils\Traits\ForwardsCalls;
+use Hyperf\Stringable\Str;
+use Hyperf\Support\Traits\ForwardsCalls;
 use InvalidArgumentException;
 use RuntimeException;
+
+use function Hyperf\Collection\collect;
+use function Hyperf\Collection\last;
+use function Hyperf\Tappable\tap;
 
 class Builder
 {
@@ -652,18 +656,22 @@ class Builder
             return $this->whereNull($column, $boolean, $operator !== '=');
         }
 
+        $type = 'Basic';
+
         // If the column is making a JSON reference we'll check to see if the value
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
         if (Str::contains((string) $column, '->') && is_bool($value)) {
             $value = new Expression($value ? 'true' : 'false');
+
+            if (is_string($column)) {
+                $type = 'JsonBoolean';
+            }
         }
 
         // Now that we are working with just a simple query we can put the elements
         // in our array and add the query binding to our array of bindings that
         // will be bound to each SQL statements when it is finally executed.
-        $type = 'Basic';
-
         $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
         if (! $value instanceof Expression) {
@@ -1473,6 +1481,36 @@ class Builder
     }
 
     /**
+     * Add a "where fulltext" clause to the query.
+     *
+     * @param string|string[] $columns
+     * @return $this
+     */
+    public function whereFullText(array|string $columns, string $value, array $options = [], string $boolean = 'and'): static
+    {
+        $type = 'FullText';
+
+        $columns = (array) $columns;
+
+        $this->wheres[] = compact('type', 'columns', 'value', 'options', 'boolean');
+
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    /**
+     * Add a "or where fulltext" clause to the query.
+     *
+     * @param string|string[] $columns
+     * @return $this
+     */
+    public function orWhereFullText(array|string $columns, string $value, array $options = []): static
+    {
+        return $this->whereFullText($columns, $value, $options, 'or');
+    }
+
+    /**
      * Add a "group by" clause to the query.
      *
      * @param array ...$groups
@@ -2009,7 +2047,7 @@ class Builder
      *
      * @param string $column
      * @param null|string $key
-     * @return \Hyperf\Utils\Collection
+     * @return \Hyperf\Collection\Collection
      */
     public function pluck($column, $key = null)
     {
@@ -2298,6 +2336,49 @@ class Builder
     }
 
     /**
+     * Insert new records or update the existing ones.
+     *
+     * @param array|string $uniqueBy
+     * @param null|array $update
+     * @return int
+     */
+    public function upsert(array $values, $uniqueBy, $update = null)
+    {
+        if (empty($values)) {
+            return 0;
+        }
+        if ($update === []) {
+            return (int) $this->insert($values);
+        }
+
+        if (! is_array(reset($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+
+                $values[$key] = $value;
+            }
+        }
+
+        if (is_null($update)) {
+            $update = array_keys(reset($values));
+        }
+
+        $bindings = $this->cleanBindings(array_merge(
+            Arr::flatten($values, 1),
+            collect($update)->reject(function ($value, $key) {
+                return is_int($key);
+            })->all()
+        ));
+
+        return $this->connection->affectingStatement(
+            $this->grammar->compileUpsert($this, $values, (array) $uniqueBy, $update),
+            $bindings
+        );
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param string $column
@@ -2500,6 +2581,16 @@ class Builder
         $this->useWritePdo = true;
 
         return $this;
+    }
+
+    /**
+     * Clone the query.
+     *
+     * @return static
+     */
+    public function clone()
+    {
+        return clone $this;
     }
 
     /**
@@ -2825,7 +2916,7 @@ class Builder
      * @param array $queryResult
      * @param string $column
      * @param string $key
-     * @return \Hyperf\Utils\Collection
+     * @return \Hyperf\Collection\Collection
      */
     protected function pluckFromObjectColumn($queryResult, $column, $key)
     {
@@ -2850,7 +2941,7 @@ class Builder
      * @param array $queryResult
      * @param string $column
      * @param string $key
-     * @return \Hyperf\Utils\Collection
+     * @return \Hyperf\Collection\Collection
      */
     protected function pluckFromArrayColumn($queryResult, $column, $key)
     {

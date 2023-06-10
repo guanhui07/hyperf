@@ -231,7 +231,7 @@ class UserTest extends HttpTestCase
 {
     public function testUserDaoFirst()
     {
-        $model = \Hyperf\Utils\ApplicationContext::getContainer()->get(UserDao::class)->first(1);
+        $model = \Hyperf\Context\ApplicationContext::getContainer()->get(UserDao::class)->first(1);
 
         var_dump($model);
 
@@ -254,7 +254,7 @@ composer test -- --filter=testUserDaoFirst
 
 如果在編寫測試時無法使用（或選擇不使用）實際的依賴元件(DOC)，可以用測試替身來代替。測試替身不需要和真正的依賴元件有完全一樣的的行為方式；他只需要提供和真正的元件同樣的 API 即可，這樣被測系統就會以為它是真正的元件！
 
-下面展示分別透過建構函式注入依賴、透過 `@Inject` 註釋注入依賴的測試替身
+下面展示分別透過建構函式注入依賴、透過 `#[Inject]` 註釋注入依賴的測試替身
 
 ### 建構函式注入依賴的測試替身
 
@@ -392,7 +392,7 @@ namespace HyperfTest\Cases;
 use App\Api\DemoApi;
 use App\Logic\DemoLogic;
 use Hyperf\Di\Container;
-use Hyperf\Utils\ApplicationContext;
+use Hyperf\Context\ApplicationContext;
 use HyperfTest\HttpTestCase;
 use Mockery;
 

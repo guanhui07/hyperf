@@ -11,13 +11,15 @@ declare(strict_types=1);
  */
 namespace Hyperf\Database\Model;
 
+use Hyperf\Collection\Arr;
+use Hyperf\Collection\Collection as BaseCollection;
 use Hyperf\Contract\Arrayable;
 use Hyperf\Contract\CompressInterface;
 use Hyperf\Contract\UnCompressInterface;
-use Hyperf\Utils\Arr;
-use Hyperf\Utils\Collection as BaseCollection;
-use Hyperf\Utils\Str;
+use Hyperf\Stringable\Str;
 use RuntimeException;
+
+use function Hyperf\Support\value;
 
 /**
  * @template TKey of array-key
@@ -421,6 +423,17 @@ class Collection extends BaseCollection implements CompressInterface
     public function makeVisible($attributes)
     {
         return $this->each->makeVisible($attributes);
+    }
+
+    /**
+     * Append an attribute across the entire collection.
+     *
+     * @param array|string $attributes
+     * @return $this
+     */
+    public function append($attributes)
+    {
+        return $this->each->append($attributes);
     }
 
     /**

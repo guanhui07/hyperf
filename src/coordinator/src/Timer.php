@@ -15,6 +15,8 @@ use Closure;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Throwable;
 
+use function Hyperf\Coroutine\go;
+
 class Timer
 {
     public const STOP = 'stop';
@@ -38,7 +40,11 @@ class Timer
         go(function () use ($timeout, $closure, $identifier, $id) {
             try {
                 ++Timer::$count;
-                $isClosing = CoordinatorManager::until($identifier)->yield($timeout);
+                $isClosing = match (true) {
+                    $timeout > 0 => CoordinatorManager::until($identifier)->yield($timeout), // Run after $timeout seconds.
+                    $timeout == 0 => CoordinatorManager::until($identifier)->isClosing(), // Run immediately.
+                    default => CoordinatorManager::until($identifier)->yield(), // Run until $identifier resume.
+                };
                 if (isset($this->closures[$id])) {
                     $closure($isClosing);
                 }
@@ -59,7 +65,7 @@ class Timer
                 $round = 0;
                 ++Timer::$count;
                 while (true) {
-                    $isClosing = CoordinatorManager::until($identifier)->yield($timeout);
+                    $isClosing = CoordinatorManager::until($identifier)->yield(max($timeout, 0.000001));
                     if (! isset($this->closures[$id])) {
                         break;
                     }
@@ -86,6 +92,11 @@ class Timer
             }
         });
         return $id;
+    }
+
+    public function until(Closure $closure, string $identifier = Constants::WORKER_EXIT): int
+    {
+        return $this->after(-1, $closure, $identifier);
     }
 
     public function clear(int $id): void

@@ -18,9 +18,11 @@ use Hyperf\LoadBalancer\Node;
 use Hyperf\LoadBalancer\Random;
 use Hyperf\RpcMultiplex\Socket;
 use Hyperf\RpcMultiplex\SocketFactory;
-use Hyperf\Utils\Reflection\ClassInvoker;
+use Hyperf\Support\Reflection\ClassInvoker;
 use HyperfTest\RpcMultiplex\Stub\ContainerStub;
 use Mockery;
+
+use function Hyperf\Coroutine\go;
 
 /**
  * @internal

@@ -13,6 +13,8 @@ namespace Hyperf\Database\Model;
 
 use ArrayAccess;
 use Exception;
+use Hyperf\Collection\Arr;
+use Hyperf\Collection\Collection as BaseCollection;
 use Hyperf\Contract\Arrayable;
 use Hyperf\Contract\CompressInterface;
 use Hyperf\Contract\Jsonable;
@@ -20,13 +22,17 @@ use Hyperf\Contract\UnCompressInterface;
 use Hyperf\Database\ConnectionInterface;
 use Hyperf\Database\Model\Relations\Pivot;
 use Hyperf\Database\Query\Builder as QueryBuilder;
-use Hyperf\Utils\Arr;
-use Hyperf\Utils\Collection as BaseCollection;
-use Hyperf\Utils\Str;
+use Hyperf\Stringable\Str;
 use JsonSerializable;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\StoppableEventInterface;
 use Throwable;
+
+use function Hyperf\Collection\collect;
+use function Hyperf\Collection\last;
+use function Hyperf\Support\class_basename;
+use function Hyperf\Support\class_uses_recursive;
+use function Hyperf\Tappable\tap;
 
 /**
  * @mixin ModelIDE
@@ -178,6 +184,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if (in_array($method, ['increment', 'decrement'])) {
             return $this->{$method}(...$parameters);
+        }
+
+        if ($resolver = $this->relationResolver(static::class, $method)) {
+            return $resolver($this);
         }
 
         return $this->newQuery()->{$method}(...$parameters);
@@ -591,7 +601,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Destroy the models for the given IDs.
      *
-     * @param array|\Hyperf\Utils\Collection|int $ids
+     * @param array|\Hyperf\Collection\Collection|int $ids
      */
     public static function destroy($ids): int
     {

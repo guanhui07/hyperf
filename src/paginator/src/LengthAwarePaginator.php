@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace Hyperf\Paginator;
 
 use Countable;
+use Hyperf\Collection\Collection;
 use Hyperf\Contract\Arrayable;
 use Hyperf\Contract\Jsonable;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
-use Hyperf\Utils\Collection;
 use IteratorAggregate;
 use JsonSerializable;
 use RuntimeException;
@@ -39,6 +39,8 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Count
      */
     public function __construct(mixed $items, int $total, int $perPage, ?int $currentPage = 1, array $options = [])
     {
+        $this->options = $options;
+
         foreach ($options as $key => $value) {
             $this->{$key} = $value;
         }

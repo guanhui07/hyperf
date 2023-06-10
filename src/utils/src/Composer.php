@@ -12,8 +12,14 @@ declare(strict_types=1);
 namespace Hyperf\Utils;
 
 use Composer\Autoload\ClassLoader;
+use Hyperf\Collection\Collection;
 use RuntimeException;
 
+use function Hyperf\Collection\collect;
+
+/**
+ * @deprecated since 3.1, use Hyperf\Support\Composer instead.
+ */
 class Composer
 {
     private static ?Collection $content = null;

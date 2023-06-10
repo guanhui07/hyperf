@@ -11,21 +11,25 @@ declare(strict_types=1);
  */
 namespace Hyperf\SocketIOServer\Room;
 
+use Hyperf\Context\ApplicationContext;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Coordinator\Constants;
 use Hyperf\Coordinator\CoordinatorManager;
+use Hyperf\Coroutine\Coroutine;
 use Hyperf\Redis\RedisFactory;
 use Hyperf\Redis\RedisProxy;
 use Hyperf\Server\Exception\RuntimeException;
 use Hyperf\SocketIOServer\Emitter\Flagger;
 use Hyperf\SocketIOServer\NamespaceInterface;
 use Hyperf\SocketIOServer\SidProvider\SidProviderInterface;
-use Hyperf\Utils\ApplicationContext;
-use Hyperf\Utils\Coroutine;
 use Hyperf\WebSocketServer\Sender;
 use Mix\Redis\Subscriber\Subscriber;
 use Redis;
 use Throwable;
+
+use function Hyperf\Collection\data_get;
+use function Hyperf\Support\make;
+use function Hyperf\Support\retry;
 
 class RedisAdapter implements AdapterInterface, EphemeralInterface
 {
@@ -334,7 +338,7 @@ class RedisAdapter implements AdapterInterface, EphemeralInterface
         $sub = make(Subscriber::class, [
             'host' => $this->redis->getHost(),
             'port' => $this->redis->getPort(),
-            'password' => $this->redis->getAuth(),
+            'password' => $this->redis->getAuth() ?: '',
             'timeout' => 5,
         ]);
         $prefix = $this->redis->getOption(Redis::OPT_PREFIX);

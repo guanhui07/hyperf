@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace HyperfTest\Utils;
 
 use Exception;
+use Hyperf\Coroutine\Exception\ParallelExecutionException;
+use Hyperf\Stringable\Str;
 use Hyperf\Utils\Coroutine;
-use Hyperf\Utils\Exception\ParallelExecutionException;
 use Hyperf\Utils\Parallel;
-use Hyperf\Utils\Str;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Throwable;

@@ -243,8 +243,8 @@ use Psr\Container\ContainerInterface;
 
 class UserServiceFactory
 {
-    // 實現一個 __invoke() 方法來完成物件的生產，方法引數會自動注入一個當前的容器例項
-    public function __invoke(ContainerInterface $container)
+    // 實現一個 __invoke() 方法來完成物件的生產，方法引數會自動注入一個當前的容器例項和一個引數陣列
+    public function __invoke(ContainerInterface $container, array $parameters = [])
     {
         $config = $container->get(ConfigInterface::class);
         // 我們假設對應的配置的 key 為 cache.enable
@@ -405,10 +405,10 @@ class IndexController
 ```   
 
 在某些更極端動態的情況下，或者非 `容器(Container)` 的管理作用之下時，想要獲取到 `容器(Container)`
-物件還可以透過 `\Hyperf\Utils\ApplicationContext::getContaienr()` 方法來獲得 `容器(Container)` 物件。
+物件還可以透過 `\Hyperf\Context\ApplicationContext::getContaienr()` 方法來獲得 `容器(Container)` 物件。
 
 ```php
-$container = \Hyperf\Utils\ApplicationContext::getContainer();
+$container = \Hyperf\Context\ApplicationContext::getContainer();
 ```
 
 ## 掃描介面卡

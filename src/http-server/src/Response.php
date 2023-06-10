@@ -12,6 +12,9 @@ declare(strict_types=1);
 namespace Hyperf\HttpServer;
 
 use BadMethodCallException;
+use Hyperf\Codec\Json;
+use Hyperf\Codec\Xml;
+use Hyperf\Context\ApplicationContext;
 use Hyperf\Context\Context;
 use Hyperf\Contract\Arrayable;
 use Hyperf\Contract\Jsonable;
@@ -25,13 +28,11 @@ use Hyperf\HttpServer\Exception\Http\EncodingException;
 use Hyperf\HttpServer\Exception\Http\FileException;
 use Hyperf\HttpServer\Exception\Http\InvalidResponseException;
 use Hyperf\Macroable\Macroable;
-use Hyperf\Utils\ApplicationContext;
-use Hyperf\Utils\ClearStatCache;
-use Hyperf\Utils\Codec\Json;
-use Hyperf\Utils\Codec\Xml;
-use Hyperf\Utils\MimeTypeExtensionGuesser;
-use Hyperf\Utils\Str;
+use Hyperf\Stringable\Str;
+use Hyperf\Support\ClearStatCache;
+use Hyperf\Support\MimeTypeExtensionGuesser;
 use InvalidArgumentException;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
@@ -40,6 +41,7 @@ use Stringable;
 use Throwable;
 
 use function get_class;
+use function Hyperf\Support\value;
 
 class Response implements PsrResponseInterface, ResponseInterface
 {
@@ -204,7 +206,7 @@ class Response implements PsrResponseInterface, ResponseInterface
      * @param string $version HTTP protocol version
      * @return PsrResponseInterface
      */
-    public function withProtocolVersion($version)
+    public function withProtocolVersion($version): MessageInterface
     {
         return $this->call(__FUNCTION__, func_get_args());
     }
@@ -299,7 +301,7 @@ class Response implements PsrResponseInterface, ResponseInterface
      * @return PsrResponseInterface
      * @throws InvalidArgumentException for invalid header names or values
      */
-    public function withHeader($name, $value)
+    public function withHeader($name, $value): MessageInterface
     {
         return $this->call(__FUNCTION__, func_get_args());
     }
@@ -318,7 +320,7 @@ class Response implements PsrResponseInterface, ResponseInterface
      * @return PsrResponseInterface
      * @throws InvalidArgumentException for invalid header names or values
      */
-    public function withAddedHeader($name, $value)
+    public function withAddedHeader($name, $value): MessageInterface
     {
         return $this->call(__FUNCTION__, func_get_args());
     }
@@ -333,7 +335,7 @@ class Response implements PsrResponseInterface, ResponseInterface
      * @param string $name case-insensitive header field name to remove
      * @return PsrResponseInterface
      */
-    public function withoutHeader($name)
+    public function withoutHeader($name): MessageInterface
     {
         return $this->call(__FUNCTION__, func_get_args());
     }
@@ -359,7 +361,7 @@ class Response implements PsrResponseInterface, ResponseInterface
      * @return PsrResponseInterface
      * @throws InvalidArgumentException when the body is not valid
      */
-    public function withBody(StreamInterface $body)
+    public function withBody(StreamInterface $body): MessageInterface
     {
         return $this->call(__FUNCTION__, func_get_args());
     }
@@ -391,10 +393,9 @@ class Response implements PsrResponseInterface, ResponseInterface
      * @param string $reasonPhrase the reason phrase to use with the
      *                             provided status code; if none is provided, implementations MAY
      *                             use the defaults as suggested in the HTTP specification
-     * @return PsrResponseInterface
      * @throws InvalidArgumentException for invalid status code arguments
      */
-    public function withStatus($code, $reasonPhrase = '')
+    public function withStatus($code, $reasonPhrase = ''): PsrResponseInterface
     {
         return $this->call(__FUNCTION__, func_get_args());
     }

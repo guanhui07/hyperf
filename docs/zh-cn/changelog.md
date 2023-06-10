@@ -1,5 +1,347 @@
 # 版本更新记录
 
+# v3.0.24 - 2023-06-10
+
+## 修复
+
+- [#5794](https://github.com/hyperf/hyperf/pull/5794) 修复代理类中 `__FILE__` 和 `__DIR__` 定位错误的问题。
+- [#5803](https://github.com/hyperf/hyperf/pull/5803) 修复组件 `hyperf/http-server` 不适配新版本 `Psr7` 的问题。
+- [#5808](https://github.com/hyperf/hyperf/pull/5808) 修复验证器规则 `le`、`lte`、`gt`、`gte` 不发正常比较 `numeric` 和 `string`。
+
+## 优化
+
+- [#5789](https://github.com/hyperf/hyperf/pull/5789) 支持高版本 `psr/http-message`。
+- [#5806](https://github.com/hyperf/hyperf/pull/5806) 优化 Swow 服务，默认情况下合并通用配置。
+- [#5814](https://github.com/hyperf/hyperf/pull/5814) 增加方法 `build_sql`，在抛出异常 `QueryException` 时，可以快速的构建 `SQL` .
+
+# v3.0.23 - 2023-06-02
+
+## 新增
+
+- [#5757](https://github.com/hyperf/hyperf/pull/5757) 支持 `Nacos` 服务注册与发现签名机制。
+- [#5765](https://github.com/hyperf/hyperf/pull/5765) 为 `database` 组件增加全文检索的功能。
+
+## 修复
+
+- [#5782](https://github.com/hyperf/hyperf/pull/5782) 修复 `prometheus` 无法正常收集 `histograms` 的问题。
+
+## 优化
+
+- [#5768](https://github.com/hyperf/hyperf/pull/5768) 为 `Hyperf\Command\Annotation\Command` 组件增加参数支持。
+- [#5780](https://github.com/hyperf/hyperf/pull/5780) 修复 `Zipkin\Propagation\Map` 中 `String` 类型检测错误的问题。
+
+# v3.0.22 - 2023-05-27
+
+## 新增
+
+- [#5760](https://github.com/hyperf/hyperf/pull/5760) 为组件 `hyperf/translation` 组件的助手函数增加命名空间。
+- [#5761](https://github.com/hyperf/hyperf/pull/5761) 新增方法 `Hyperf\Coordinator\Timer::until()`.
+
+## 优化
+
+- [#5741](https://github.com/hyperf/hyperf/pull/5741) 为 `Hyperf\DB\MySQLConnection` 增加即将过期的标签。
+- [#5702](https://github.com/hyperf/hyperf/pull/5702) 优化了 `Hyperf\Metric\Adapter\Prometheus\Redis` 的代码，使其允许被重写 `KEY` 键前缀。
+- [#5762](https://github.com/hyperf/hyperf/pull/5762) 自定义进程默认使用非阻塞模式。
+
+# v3.0.21 - 2023-05-18
+
+## 新增
+
+- [#5721](https://github.com/hyperf/hyperf/pull/5721) 为 `Request` 生命周期事件，增加 `exception` 参数。
+- [#5723](https://github.com/hyperf/hyperf/pull/5723) 为 `hyperf/db` 组件增加 `Swoole5.x` 的 `PgSQL` 支持。
+- [#5725](https://github.com/hyperf/hyperf/pull/5725) 为 `hyperf/db` 组件增加 `Swoole4.x` 的 `PgSQL` 支持。
+- [#5731](https://github.com/hyperf/hyperf/pull/5731) 新增方法 `Arr::hasAny()`。
+
+## 修复
+
+- [#5726](https://github.com/hyperf/hyperf/pull/5726) [#5730](https://github.com/hyperf/hyperf/pull/5730) 修复使用 `pgsql-swoole` 类型的 `ORM` 时，`PgSQL` 链接不会自动初始化的问题。
+
+## 优化
+
+- [#5718](https://github.com/hyperf/hyperf/pull/5718) 优化了 `view-engine` 组件的代码，并增加了一些单元测试。
+- [#5719](https://github.com/hyperf/hyperf/pull/5719) 优化了 `metric` 组件的代码，并增加了一些单元测试。
+- [#5720](https://github.com/hyperf/hyperf/pull/5720) 优化了 `Hyperf\Metric\Listener\OnPipeMessage` 的代码，来避免消息阻塞的问题。
+
+# v3.0.20 - 2023-05-12
+
+## 新增
+
+- [#5707](https://github.com/hyperf/hyperf/pull/5707) 新增助手函数 `Hyperf\Config\config`。
+- [#5711](https://github.com/hyperf/hyperf/pull/5711) 新增方法 `Arr::mapWithKeys()`。
+- [#5715](https://github.com/hyperf/hyperf/pull/5715) 增加请求级别生命周期事件。
+
+## 修复
+
+- [#5709](https://github.com/hyperf/hyperf/pull/5709) 当日志组不存在时，修复错误日志记录有误的问题。
+- [#5713](https://github.com/hyperf/hyperf/pull/5713) 为 `Hyperf\SuperGlobals\Proxy\Server` 增加通过自身进行实例化的能力。
+
+## 优化
+
+- [#5716](https://github.com/hyperf/hyperf/pull/5716) 为协程风格服务增加超全局变量的支持。
+
+# v3.0.19 - 2023-05-06
+
+## 修复
+
+- [#5679](https://github.com/hyperf/hyperf/pull/5679) 修复 `#[Task]` 注解的 `$timeout` 类型与 `TaskAspect` 不一致的问题。
+- [#5684](https://github.com/hyperf/hyperf/pull/5684) 修复使用了 `break` 语法后，`blade` 视图模板无法正常使用的问题。
+
+## 新增
+
+- [#5680](https://github.com/hyperf/hyperf/pull/5680) 为 `rpc-multiplex` 增加存储 `RPC` 上下文的能力。
+- [#5695](https://github.com/hyperf/hyperf/pull/5695) 为数据库迁移组件，增加设置 `datetime` 类型的创建时间和修改时间的功能。
+- [#5699](https://github.com/hyperf/hyperf/pull/5699) 增加 `Model::resolveRelationUsing()`，用来动态创建模型关系。
+
+## 优化
+
+- [#5694](https://github.com/hyperf/hyperf/pull/5694) 将 `hyperf/utils` 从 `hyperf/rpc` 组件中移除。
+- [#5696](https://github.com/hyperf/hyperf/pull/5694) 使用 `Hyperf\Coroutine\Coroutine::sleep()` 替代 `Swoole\Coroutine::sleep()`。
+
+# v3.0.18 - 2023-04-26
+
+## 新增
+
+- [#5672](https://github.com/hyperf/hyperf/pull/5672) 将部分 `utils` 中的方法，复制到 `hyperf/support` 组件中，并增加对应的命名空间。
+
+## 修复
+
+- [#5662](https://github.com/hyperf/hyperf/pull/5662) 修复 `pgsql-swoole` 执行失败时，无法抛出异常的问题。
+
+## 优化
+
+- [#5660](https://github.com/hyperf/hyperf/pull/5660) 将 `hyperf/codec` 从 `hyperf/utils` 分离出来。
+- [#5663](https://github.com/hyperf/hyperf/pull/5663) 将 `hyperf/serializer` 从 `hyperf/utils` 分离出来。
+- [#5666](https://github.com/hyperf/hyperf/pull/5666) 将 `Packers` 从 `hyperf/utils` 分离到 `hyperf/codec` 中。
+- [#5668](https://github.com/hyperf/hyperf/pull/5668) 将 `hyperf/support` 从 `hyperf/utils` 分离出来。
+- [#5670](https://github.com/hyperf/hyperf/pull/5670) 将 `hyperf/code-parser` 从 `hyperf/utils` 分离出来。
+- [#5671](https://github.com/hyperf/hyperf/pull/5671) 使用 `Hyperf\Coroutine\Channel\Pool` 代替 `Hyperf\Utils\ChannelPool` 。
+- [#5674](https://github.com/hyperf/hyperf/pull/5674) 将 `Hyperf\Utils` 命名空间的类和方法，使用新组件进行替换。
+
+# v3.0.17 - 2023-04-19
+
+## 修复
+
+- [#5642](https://github.com/hyperf/hyperf/pull/5642) 修复使用批量读取模型缓存时，遇到不存在的数据时，无法初始化空缓存的问题。
+- [#5643](https://github.com/hyperf/hyperf/pull/5643) 修复使用批量读取模型缓存时，空缓存无法正常使用的问题。
+- [#5649](https://github.com/hyperf/hyperf/pull/5649) 修复协程风格下，无法初始化数据库字段收集器的问题。
+
+## 新增
+
+- [#5634](https://github.com/hyperf/hyperf/pull/5634) 新增助手函数 `Hyperf\Stringable\str()`。
+- [#5639](https://github.com/hyperf/hyperf/pull/5639) 新增方法 `Redis::pipeline()` 和 `Redis::transaction()`。
+- [#5641](https://github.com/hyperf/hyperf/pull/5641) 为模型缓存 `loadCache` 增加嵌套初始化缓存的能力。
+- [#5646](https://github.com/hyperf/hyperf/pull/5646) 增加 `PriorityDefinition` 类，来处理容器 `dependencies` 优先级的问题。
+
+## 优化
+
+- [#5634](https://github.com/hyperf/hyperf/pull/5634) 使用 `Hyperf\Stringable\Str` 替代 `Hyperf\Utils\Str`。
+- [#5636](https://github.com/hyperf/hyperf/pull/5636) 优化 `kafka` 消费者，启动时等待消费过长的问题。
+- [#5648](https://github.com/hyperf/hyperf/pull/5648) 将依赖 `hyperf/utils` 从 `hyperf/guzzle` 中移除。
+
+# v3.0.16 - 2023-04-12
+
+## 修复
+
+- [#5627](https://github.com/hyperf/hyperf/pull/5627) 修复方法 `Hyperf\Context\Context::destroy` 支持协程下调用。
+
+## 优化
+
+- [#5616](https://github.com/hyperf/hyperf/pull/5616) 将 `ApplicationContext` 从 `hyperf/utils` 分离到 `hyperf/context`。
+- [#5617](https://github.com/hyperf/hyperf/pull/5617) 将 `hyperf/guzzle` 从 `hyperf/consul` 依赖中移除。
+- [#5618](https://github.com/hyperf/hyperf/pull/5618) 支持在 Swagger 面板中设置默认路由。
+- [#5619](https://github.com/hyperf/hyperf/pull/5619) [#5620](https://github.com/hyperf/hyperf/pull/5620) 将 `hyperf/coroutine` 从 `hyperf/utils` 分离出来。
+- [#5621](https://github.com/hyperf/hyperf/pull/5621) 使用 `Hyperf\Context\ApplicationContext` 代替 `Hyperf\Utils\ApplicationContext`。
+- [#5622](https://github.com/hyperf/hyperf/pull/5622) 将 `CoroutineProxy` 从 `hyperf/utils` 分离到 `hyperf/context`。
+- [#5623](https://github.com/hyperf/hyperf/pull/5623) 使用 `Hyperf\Coroutine\Coroutine` 替代 `Hyperf\Utils\Coroutine`。
+- [#5624](https://github.com/hyperf/hyperf/pull/5624) 将 `Channel` 相关方法从 `hyperf/utils` 分离到 `hyperf/coroutine`。
+- [#5629](https://github.com/hyperf/hyperf/pull/5629) 将 `Hyperf\Utils\Arr` 继承 `Hyperf\Collection\Arr`。
+
+# v3.0.15 - 2023-04-07
+
+## 新增
+
+- [#5606](https://github.com/hyperf/hyperf/pull/5606) 新增配置 `server.options.send_channel_capacity` 用来控制使用 `协程风格` 服务时，是否使用 `SafeSocket` 来返回数据。
+
+## 优化
+
+- [#5593](https://github.com/hyperf/hyperf/pull/5593) [#5598](https://github.com/hyperf/hyperf/pull/5598) 使用 `Hyperf\Collection\Collection` 替代 `Hyperf\Utils\Collection`。
+- [#5594](https://github.com/hyperf/hyperf/pull/5594) 使用 `Hyperf\Collection\Arr` 替代 `Hyperf\Utils\Arr`。
+- [#5596](https://github.com/hyperf/hyperf/pull/5596) 将 `hyperf/pipeline` 从 `hyperf/utils` 分离出来。
+- [#5599](https://github.com/hyperf/hyperf/pull/5599) 使用 `Hyperf\Pipeline\Pipeline` 替代 `Hyperf\Utils\Pipeline`。
+
+# v3.0.14 - 2023-04-01
+
+## 修复
+
+- [#5578](https://github.com/hyperf/hyperf/pull/5578) 修复了无法序列化 `Crontab` 的问题。
+- [#5579](https://github.com/hyperf/hyperf/pull/5579) 修复 `crontab:run` 无法正常工作的问题。
+
+## 优化
+
+- [#5572](https://github.com/hyperf/hyperf/pull/5572) 优化了 `HTTP` 服务，使用 `WritableConnection` 实现，支持 `Swow`。
+- [#5577](https://github.com/hyperf/hyperf/pull/5577) 将组件 `hyperf/collection` 从 `hyperf/utils` 分离。
+- [#5580](https://github.com/hyperf/hyperf/pull/5580) 将组件 `hyperf/conditionable` 和 `hyperf/tappable` 从 `hyperf/utils` 分离。
+- [#5585](https://github.com/hyperf/hyperf/pull/5585) 优化 `service-governance` 组件，去除了 `consul` 的依赖关系。
+
+# v3.0.13 - 2023-03-26
+
+## 新增
+
+- [#5561](https://github.com/hyperf/hyperf/pull/5561) 为 `hyperf/kafka` 增加自定义定时器的配置。
+- [#5562](https://github.com/hyperf/hyperf/pull/5562) 为 `MySQL` 数据库组件，增加 `upsert()` 支持。
+- [#5563](https://github.com/hyperf/hyperf/pull/5563) 为 `Crontab` 任务增加是否执行完的逻辑。
+
+## 优化
+
+- [#5544](https://github.com/hyperf/hyperf/pull/5554) 为 `grpc-server` 组件取消 `hyperf/rpc` 的依赖。
+- [#5550](https://github.com/hyperf/hyperf/pull/5550) 优化了 `Coordinator Timer` 和 `Crontab Parser` 的代码。
+- [#5566](https://github.com/hyperf/hyperf/pull/5566) 基于模型生成 `Swagger Schemas` 时，优化变量类型可以为 `Null`。
+- [#5569](https://github.com/hyperf/hyperf/pull/5569) 优化了 `Crontab RunCommand` 的依赖关系。
+
+# v3.0.12 - 2023-03-20
+
+## 新增
+
+- [#4112](https://github.com/hyperf/hyperf/pull/4112) 新增配置项 `kafka.default.enable` 用来控制消费者是否启动。
+- [#5533](https://github.com/hyperf/hyperf/pull/5533) [#5535](https://github.com/hyperf/hyperf/pull/5535) 为 `kafka` 组件增加 `client` 和 `socket` 配置，允许开发者自定义。
+- [#5536](https://github.com/hyperf/hyperf/pull/5536) 新增组件 `hyperf/http2-client`。
+- [#5538](https://github.com/hyperf/hyperf/pull/5538) 为 `hyperf/http2-client` 增加双向流支持。
+- [#5511](https://github.com/hyperf/hyperf/pull/5511) 将 `GRPC` 服务统一到 `RPC` 服务中，可以更加方便的进行服务注册与发现。
+- [#5543](https://github.com/hyperf/hyperf/pull/5543) 增加 `Nacos` 双向流支持，可以监听到配置中心实时更新的事件。
+- [#5545](https://github.com/hyperf/hyperf/pull/5545) 为组件 `hyperf/http2-client` 增加双向流相关的测试。
+- [#5546](https://github.com/hyperf/hyperf/pull/5546) 为 `Nacos` 配置中心增加 `GRPC` 功能，可以实时监听配置的变化。
+
+## 优化
+
+- [#5539](https://github.com/hyperf/hyperf/pull/5539) 优化了 `AMQPConnection` 的代码，以支持最新版本的 `php-amqplib` 组件。
+- [#5528](https://github.com/hyperf/hyperf/pull/5528) 优化了 `aspects` 的配置，对热重启有更好的支持。
+- [#5541](https://github.com/hyperf/hyperf/pull/5541) 提升了 `FactoryResolver` 基于 `XXXFactory` 实例化对象的能力，增加了可选参数配置。
+
+# v3.0.11 - 2023-03-15
+
+## 新增
+
+- [#5499](https://github.com/hyperf/hyperf/pull/5499) 为 `hyperf/constants` 组件增加枚举(>=PHP8.1)类型支持。
+- [#5508](https://github.com/hyperf/hyperf/pull/5508) 新增方法 `Hyperf\Rpc\Protocol::getNormalizer`。
+- [#5509](https://github.com/hyperf/hyperf/pull/5509) 为 `json-rpc` 组件自动注册 `normalizer`。
+- [#5513](https://github.com/hyperf/hyperf/pull/5513) 组件 `rpc-multiplex` 使用默认的 `normalizer` 并对 `rpc-server` 增加自定义 `protocol.normalizer` 的支持。
+- [#5518](https://github.com/hyperf/hyperf/pull/5518) 增加方法 `SwooleConnection::getSocket` 用来获取 `Swoole` 的 `Response`。
+- [#5520](https://github.com/hyperf/hyperf/pull/5520) 新增方法 `Coroutine::stats()` 和 `Coroutine::exists()`。
+- [#5525](https://github.com/hyperf/hyperf/pull/5525) 新增配置 `kafka.default.consume_timeout` 用来控制消费者消费数据的超时时间。
+- [#5526](https://github.com/hyperf/hyperf/pull/5526) 新增方法 `Hyperf\Kafka\AbstractConsumer::isEnable()` 用来控制 `kafka` 消费者是否启动。
+
+## 修复
+
+- [#5519](https://github.com/hyperf/hyperf/pull/5519) 修复因 `kafka` 生产者 `loop` 方法导致进程无法正常退出的问题。
+- [#5523](https://github.com/hyperf/hyperf/pull/5523) 修复在发生 `kafka rebalance` 的时候，进程无故停止的问题。
+
+## 优化
+
+- [#5510](https://github.com/hyperf/hyperf/pull/5510) 允许开发者自定义 `RPC 客户端` 的 `normalizer` 的实现。
+- [#5525](https://github.com/hyperf/hyperf/pull/5525) 当消费 `kafka` 消息时，每个消息会在独立的协程中进行处理。
+
+# v3.0.10 - 2023-03-11
+
+## 修复
+
+- [#5497](https://github.com/hyperf/hyperf/pull/5497) 修复 `apollo` 配置中心，无法正常触发 `ConfigChanged` 事件的问题。
+
+## 新增
+
+- [#5491](https://github.com/hyperf/hyperf/pull/5491) 为 `Str` 和 `Stringable` 新增 `charAt` 方法。
+- [#5503](https://github.com/hyperf/hyperf/pull/5503) 新增 `Hyperf\Contract\JsonDeSerializable`。
+- [#5504](https://github.com/hyperf/hyperf/pull/5504) 新增 `Hyperf\Utils\Serializer\JsonDeNormalizer`。
+
+## 优化
+
+- [#5493](https://github.com/hyperf/hyperf/pull/5493) 优化 `Nacos` 服务注册器的代码，使其支持 `1.x` 和 `2.x` 版本。
+- [#5494](https://github.com/hyperf/hyperf/pull/5494) [#5501](https://github.com/hyperf/hyperf/pull/5501) 优化 `hyperf/guzzle` 组件，当使用 `Swoole` 且不支持 `native-curl` 时，才会默认替换 `Handler`。
+
+## 变更
+
+- [#5492](https://github.com/hyperf/hyperf/pull/5492) 将 `Hyperf\DbConnection\Listener\CreatingListener` 重命名为 `Hyperf\DbConnection\Listener\InitUidOnCreatingListener`.
+
+# v3.0.9 - 2023-03-05
+
+## 新增
+
+- [#5467](https://github.com/hyperf/hyperf/pull/5467) 为 `GRPC` 增加 `Google\Rpc\Status` 的支持。
+- [#5472](https://github.com/hyperf/hyperf/pull/5472) 为模型增加 `ulid` 和 `uuid` 的支持。
+- [#5476](https://github.com/hyperf/hyperf/pull/5476) 为 `Stringable` 增加 `ArrayAccess` 的支持。
+- [#5478](https://github.com/hyperf/hyperf/pull/5478) 为 `Stringable` 和 `Str` 增加 `isMatch` 方法。
+
+## 优化
+
+- [#5469](https://github.com/hyperf/hyperf/pull/5469) 当数据库连接出现问题时，确保连接在归还到连接池前被重置。
+
+# v3.0.8 - 2023-02-26
+
+## 修复
+
+- [#5433](https://github.com/hyperf/hyperf/pull/5433) [#5438](https://github.com/hyperf/hyperf/pull/5438) 修复 `Nacos` 临时实例，不需要发送心跳的问题。 
+- [#5464](https://github.com/hyperf/hyperf/pull/5464) 修复 `Swagger` 服务无法在异步风格中，正常启动的问题。
+
+## 新增
+
+- [#5434](https://github.com/hyperf/hyperf/pull/5434) 为 `Swow` 增加 `UDP` 服务的支持。
+- [#5444](https://github.com/hyperf/hyperf/pull/5444) 新增脚本 `GenSchemaCommand` 用来生成 `Swagger Schema`。
+- [#5451](https://github.com/hyperf/hyperf/pull/5451) 为模型集合新增 `appends($attributes)` 方法。
+- [#5453](https://github.com/hyperf/hyperf/pull/5453) 为测试组件增加 `put()` 和 `patch()` 方法。
+- [#5454](https://github.com/hyperf/hyperf/pull/5454) 为 `GRPC` 组件新增方法 `Hyperf\Grpc\Parser::statusFromResponse`。
+- [#5459](https://github.com/hyperf/hyperf/pull/5459) 为 `Str` 和 `Stringable` 新增方法 `uuid` 和 `ulid`。
+
+## 优化
+
+- [#5437](https://github.com/hyperf/hyperf/pull/5437) 为 `Str::length` 移除了没用的 `if` 判断。
+- [#5439](https://github.com/hyperf/hyperf/pull/5439) 优化了 `Arr::shuffle` 的代码。
+
+# v3.0.7 - 2023-02-18
+
+## 新增
+
+- [#5042](https://github.com/hyperf/hyperf/pull/5402) 为 `Swagger` 组件增加配置 `swagger.scan.paths` 可以用来重写默认的扫描目录。
+- [#5403](https://github.com/hyperf/hyperf/pull/5403) 为 `Swow` 增加 `Swoole Server` 配置项的适配。
+- [#5404](https://github.com/hyperf/hyperf/pull/5404) 为 `Swagger` 增加多端口服务的支持。
+- [#5406](https://github.com/hyperf/hyperf/pull/5406) 为 `Hyperf\Database\Model\Builder` 增加 `mixin` 方法。
+- [#5407](https://github.com/hyperf/hyperf/pull/5407) 为 `Swagger` 增加请求方法 `Delete` 和 `Options` 的支持。
+- [#5409](https://github.com/hyperf/hyperf/pull/5409) 为数据库组件中 `Query\Builder` 和 `Paginator` 类增加了一部分方法。
+- [#5414](https://github.com/hyperf/hyperf/pull/5414) 为 `Hyperf\Database\Model\Builder` 增加了 `clone` 方法。
+- [#5418](https://github.com/hyperf/hyperf/pull/5418) 为配置中心增加了 `ConfigChanged` 事件。
+- [#5429](https://github.com/hyperf/hyperf/pull/5429) 在连接 `Aliyun Nacos` 服务时，增加了配置项 `access_key` 和 `access_secret`。
+
+## 修复
+
+- [#5405](https://github.com/hyperf/hyperf/pull/5405) 修复了当系统支持 `IPv6` 时，`get local ip` 无法正常读取 ip 的问题。
+- [#5417](https://github.com/hyperf/hyperf/pull/5417) 修复 `PgSQL` 无法正常使用数据库迁移功能的问题。
+- [#5421](https://github.com/hyperf/hyperf/pull/5421) 修复数据库 `Json` 结构无法正常使用 `boolean` 类型的问题。
+- [#5428](https://github.com/hyperf/hyperf/pull/5428) 修复 `Metric` 中间件遇到异常时，服务端参数统计有误的问题。
+- [#5424](https://github.com/hyperf/hyperf/pull/5424) 修复数据库迁移组件，不支持 `PHP8.2` 的问题。
+
+## 优化
+
+- [#5411](https://github.com/hyperf/hyperf/pull/5411) 优化代码，异常 `WebSocketHandeShakeException` 应继承 `BadRequestHttpException`。
+- [#5419](https://github.com/hyperf/hyperf/pull/5419) 优化 `RPN` 组件的实现逻辑，可以更好的进行自定义扩展。
+- [#5422](https://github.com/hyperf/hyperf/pull/5422) 当安装 `Swagger` 组件后，默认启动 `Swagger` 的能力。
+
+# v3.0.6 - 2023-02-12
+
+## 修复
+
+- [#5361](https://github.com/hyperf/hyperf/pull/5361) 修复 `Nacos` 注入临时实例失败的问题。
+- [#5382](https://github.com/hyperf/hyperf/pull/5382) 修复 `SocketIO` 中使用 `mix-subscriber` 时，因为没有设置密码而报错的问题。
+- [#5386](https://github.com/hyperf/hyperf/pull/5386) 修复 `SwoolePostgresqlClient` 会被执行到不存在的方法 `exec` 的问题。
+- [#5394](https://github.com/hyperf/hyperf/pull/5394) 修复 `hyperf/config-apollo` 无法正常使用的问题。
+
+## 新增
+
+- [#5366](https://github.com/hyperf/hyperf/pull/5366) 为 `hyperf/database` 增加 `forceDeleting` 事件。
+- [#5373](https://github.com/hyperf/hyperf/pull/5373) 为 `SwowServer` 增加 `settings` 配置。
+- [#5376](https://github.com/hyperf/hyperf/pull/5376) 为 `hyperf/metric` 增加协程风格下服务状态收集的能力。
+- [#5379](https://github.com/hyperf/hyperf/pull/5379) 当 `Nacos` 心跳失败时，增加日志记录。
+- [#5389](https://github.com/hyperf/hyperf/pull/5389) 增加 `Swagger` 支持。
+- [#5395](https://github.com/hyperf/hyperf/pull/5395) 为 `Swagger` 组件，增加验证器功能。
+- [#5397](https://github.com/hyperf/hyperf/pull/5397) 支持所有已知的 `Swagger` 注解。
+
 # v3.0.5 - 2023-02-06
 
 ## 新增
@@ -2172,7 +2514,7 @@ return [
 
 use Hyperf\Di\Container;
 use Hyperf\Di\Definition\DefinitionSourceFactory;
-use Hyperf\Utils\ApplicationContext;
+use Hyperf\Context\ApplicationContext;
 
 $container = new Container((new DefinitionSourceFactory(true))());
 

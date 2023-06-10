@@ -12,13 +12,15 @@ declare(strict_types=1);
 namespace Hyperf\Validation;
 
 use Closure;
-use Hyperf\Utils\Arr;
-use Hyperf\Utils\Str;
+use Hyperf\Collection\Arr;
+use Hyperf\Stringable\Str;
 use Hyperf\Validation\Contract\Rule as RuleContract;
 use Hyperf\Validation\Rules\Exists;
 use Hyperf\Validation\Rules\Unique;
 use stdClass;
 use Stringable;
+
+use function Hyperf\Collection\head;
 
 class ValidationRuleParser
 {

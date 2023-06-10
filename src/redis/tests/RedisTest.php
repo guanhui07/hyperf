@@ -12,8 +12,10 @@ declare(strict_types=1);
 namespace HyperfTest\Redis;
 
 use Hyperf\Config\Config;
+use Hyperf\Context\ApplicationContext;
 use Hyperf\Context\Context;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Coroutine\Coroutine;
 use Hyperf\Di\Container;
 use Hyperf\Engine\Channel as Chan;
 use Hyperf\Pool\Channel;
@@ -24,8 +26,6 @@ use Hyperf\Redis\Pool\PoolFactory;
 use Hyperf\Redis\Pool\RedisPool;
 use Hyperf\Redis\Redis;
 use Hyperf\Redis\RedisProxy;
-use Hyperf\Utils\ApplicationContext;
-use Hyperf\Utils\Coroutine;
 use HyperfTest\Redis\Stub\RedisPoolFailedStub;
 use HyperfTest\Redis\Stub\RedisPoolStub;
 use Mockery;
@@ -34,6 +34,10 @@ use RedisCluster;
 use RedisSentinel;
 use ReflectionClass;
 use Throwable;
+
+use function Hyperf\Coroutine\defer;
+use function Hyperf\Coroutine\go;
+use function Hyperf\Coroutine\parallel;
 
 /**
  * @internal
