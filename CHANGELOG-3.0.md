@@ -1,4 +1,78 @@
-# v3.0.25 - TBD
+# v3.0.31 - TBD
+
+# v3.0.30 - 2023-07-21
+
+## Fixed
+
+- [#5947](https://github.com/hyperf/hyperf/pull/5947) Fixed bug that lock failed when using more than one pool for amqp.
+
+## Optimized
+
+- [#5954](https://github.com/hyperf/hyperf/pull/5954) Optimized the model generator to generate correct property comments.
+
+## Added
+
+- [#5951](https://github.com/hyperf/hyperf/pull/5951) Added `SameSite` support to session cookies.
+- [#5955](https://github.com/hyperf/hyperf/pull/5955) Support `access_key` and `access_secret` for nacos service governance.
+- [#5957](https://github.com/hyperf/hyperf/pull/5957) Added `Hyperf\Codec\Packer\IgbinarySerializerPacker`.
+- [#5962](https://github.com/hyperf/hyperf/pull/5962) Support modify the context of sub coroutine when using test components.
+
+# v3.0.29 - 2023-07-14
+
+## Fixed
+
+- [#5921](https://github.com/hyperf/hyperf/pull/5921) Fixed bug that `http2-client` cannot be closed when didn't open heartbeat.
+- [#5923](https://github.com/hyperf/hyperf/pull/5923) Fixed bug that `nacos grpc client` cannot be closed friendly when worker exit.
+- [#5922](https://github.com/hyperf/hyperf/pull/5922) Fixed bug that `ApplicationContext` cannot be found when using `grpc-client`.
+
+## Optimized
+
+- [#5924](https://github.com/hyperf/hyperf/pull/5924) Hide the abnormal output when the worker exited.
+
+# v3.0.28 - 2023-07-08
+
+## Fixed
+
+- [#5909](https://github.com/hyperf/hyperf/pull/5909) Fixed bug that acm `client::$servers` must be accessed before initialization.
+- [#5911](https://github.com/hyperf/hyperf/pull/5911) Fixed bug that nacos grpc client auth failed.
+- [#5912](https://github.com/hyperf/hyperf/pull/5912) Fixed bug that nacos grpc client cannot reconnect when the client closed.
+
+## Added
+
+- [#5895](https://github.com/hyperf/hyperf/pull/5895) Added strict mode support for `Integer` and `Boolean`.
+
+## Optimized
+
+- [#5910](https://github.com/hyperf/hyperf/pull/5910) Optimized code about `NacosClientFactory` which will create nacos client instead of nacos application.
+
+# v3.0.27 - 2023-06-30
+
+## Fixed
+
+- [#5880](https://github.com/hyperf/hyperf/pull/5880) Fixed bug that start server failed caused by swagger server name isn't string.
+- [#5890](https://github.com/hyperf/hyperf/pull/5890) Added some exception messages which used to reconnect PDO connection.
+
+## Optimized
+
+- [#5886](https://github.com/hyperf/hyperf/pull/5886) Throw exception (executing sql failed) when used `clickhouse` for `hyperf/db`.
+
+# v3.0.26 - 2023-06-24
+
+## Fixed
+
+- [#5861](https://github.com/hyperf/hyperf/pull/5861) Fixed bug that `CoroutineMemory::clearPrefix()` cannot work as expected.
+
+## Optimized
+
+- [#5858](https://github.com/hyperf/hyperf/pull/5858) Throw exception when using `chunkById` but the column is not existed.
+- [#5882](https://github.com/hyperf/hyperf/pull/5882) Move `ConfirmableTrait`/`DisableEventDispatcher`/`NullDisableEventDispatcher` to Concerns.
+
+# v3.0.25 - 2023-06-19
+
+## Fixed
+
+- [#5829](https://github.com/hyperf/hyperf/pull/5829) Fixed bug that the method `Hyperf\Database\Model\Builder::value()` cannot work when using column like `table.column`.
+- [#5831](https://github.com/hyperf/hyperf/pull/5831) Fixed an endless loop when socket.io parses namespace.
 
 # v3.0.24 - 2023-06-10
 

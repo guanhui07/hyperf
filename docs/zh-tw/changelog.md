@@ -1,12 +1,85 @@
 # 版本更新記錄
 
+# v3.0.30 - 2023-07-21
+
+## 修復
+
+- [#5947](https://github.com/hyperf/hyperf/pull/5947) 修復使用 `amqp` 時，存在多個配置時，協程鎖失效的問題。
+
+## 最佳化
+
+- [#5954](https://github.com/hyperf/hyperf/pull/5954) 最佳化模型生成器，使其生成正確的引數註釋。
+
+## 新增
+
+- [#5951](https://github.com/hyperf/hyperf/pull/5951) 為 `Session` 的 `Cookies` 功能增加 `SameSite` 支援。
+- [#5955](https://github.com/hyperf/hyperf/pull/5955) 為 `Nacos` 服務註冊與發現，增加 `access_key` 和 `access_secret` 的支援。
+- [#5957](https://github.com/hyperf/hyperf/pull/5957) 新增 `Hyperf\Codec\Packer\IgbinarySerializerPacker`。
+- [#5962](https://github.com/hyperf/hyperf/pull/5962) 當使用測試元件時，增加支援修改子協程上下文的能力。
+
+# v3.0.29 - 2023-07-14
+
+## 修復
+
+- [#5921](https://github.com/hyperf/hyperf/pull/5921) 修復 `http2-client` 在沒有開啟心跳時，無法正常關閉的問題。
+- [#5923](https://github.com/hyperf/hyperf/pull/5923) 修復 `nacos grpc client` 當程序退出時，無法友好關閉的問題。
+- [#5922](https://github.com/hyperf/hyperf/pull/5922) 修復使用 `grpc-client` 時，會找不到 `ApplicationContext` 的問題。
+
+## 最佳化
+
+- [#5924](https://github.com/hyperf/hyperf/pull/5924) 當程序退出時，隱藏 `nacos grpc client` 相關的正常的錯誤資訊。
+
+# v3.0.28 - 2023-07-08
+
+## 修復
+
+- [#5909](https://github.com/hyperf/hyperf/pull/5909) 修復 `ACM` 配置中心因 `client::$servers` 沒有進行初始化而報錯的問題。
+- [#5911](https://github.com/hyperf/hyperf/pull/5911) 修復 `Nacos Grpc 客戶端` 許可權驗證失敗的問題。
+- [#5912](https://github.com/hyperf/hyperf/pull/5912) 修復 `Nacos Grpc 客戶端` 在 `Nacos 服務` 重啟後，重連失敗的問題。
+
+## 新增
+
+- [#5895](https://github.com/hyperf/hyperf/pull/5895) 為驗證器規則 `Integer` 和 `Boolean` 增加嚴格模式。
+
+## 最佳化
+
+- [#5910](https://github.com/hyperf/hyperf/pull/5910) 優化工廠類 `NacosClientFactory`，使其例項化 `NacosClient` 而非 `Nacos Application` 物件。
+
+# v3.0.27 - 2023-06-30
+
+## 修復
+
+- [#5880](https://github.com/hyperf/hyperf/pull/5880) 修復因 `Swagger` 服務名隨機成為數字時，導致服務無法正常啟動的問題。
+- [#5890](https://github.com/hyperf/hyperf/pull/5890) 增加了部分，需要重連 `PDO` 的錯誤資訊，避免 `PDO` 連結無法重連的問題。
+
+## 最佳化
+
+- [#5886](https://github.com/hyperf/hyperf/pull/5886) 當使用 `hyperf/db` 連線 `clickhouse` 時，如果 `SQL` 執行錯誤，則會丟擲異常。
+
+# v3.0.26 - 2023-06-24
+
+## 修復
+
+- [#5861](https://github.com/hyperf/hyperf/pull/5861) 修復快取元件中，使用 `CoroutineMemory` 時，`CoroutineMemory::clearPrefix()` 無法正常工作的問題。
+
+## 最佳化
+
+- [#5858](https://github.com/hyperf/hyperf/pull/5858) 當呼叫資料庫元件中 `chunkById` 時，如果 `Id` 為 `Null`，則丟擲異常。
+
+# v3.0.25 - 2023-06-19
+
+## 修復
+
+- [#5829](https://github.com/hyperf/hyperf/pull/5829) 修復 `Hyperf\Database\Model\Builder::value()` 當使用形如 `table.column` 的欄位時，無法正常使用的問題。
+- [#5831](https://github.com/hyperf/hyperf/pull/5831) 修復在特殊場景下 `socket.io` 元件在解析 `namespace` 時，會造成死迴圈的問題。
+
 # v3.0.24 - 2023-06-10
 
 ## 修復
 
 - [#5794](https://github.com/hyperf/hyperf/pull/5794) 修復代理類中 `__FILE__` 和 `__DIR__` 定位錯誤的問題。
 - [#5803](https://github.com/hyperf/hyperf/pull/5803) 修復元件 `hyperf/http-server` 不適配新版本 `Psr7` 的問題。
-- [#5808](https://github.com/hyperf/hyperf/pull/5808) 修復驗證器規則 `le`、`lte`、`gt`、`gte` 不發正常比較 `numeric` 和 `string`。
+- [#5808](https://github.com/hyperf/hyperf/pull/5808) 修復驗證器規則 `le`、`lte`、`gt`、`gte` 不會正常比較 `numeric` 和 `string`。
 
 ## 最佳化
 
