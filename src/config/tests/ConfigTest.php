@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Config;
 
 use Hyperf\Config\Config;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Contract\ConfigInterface;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -24,6 +26,7 @@ use function Hyperf\Config\config;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ConfigTest extends TestCase
 {
     public function testConfigFunction()
@@ -35,6 +38,5 @@ class ConfigTest extends TestCase
         ]));
 
         $this->assertSame($id, config('id'));
-        $this->assertSame($id, \config('id'));
     }
 }

@@ -9,15 +9,18 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTests\Tappable;
 
 use Hyperf\Tappable\Tappable;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class TappableTest extends TestCase
 {
     public function testTappableClassWithCallback()
@@ -31,7 +34,7 @@ class TappableTest extends TestCase
 
     public function testTappableClassWithInvokableClass()
     {
-        $name = TappableClass::make()->tap(new class() {
+        $name = TappableClass::make()->tap(new class {
             public function __invoke($tappable)
             {
                 $tappable->setName('MyName');
@@ -45,7 +48,7 @@ class TappableTest extends TestCase
     {
         $this->expectException('Error');
 
-        $name = TappableClass::make()->tap(new class() {
+        $name = TappableClass::make()->tap(new class {
             public function setName($tappable)
             {
                 $tappable->setName('MyName');

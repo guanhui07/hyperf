@@ -9,11 +9,13 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\ConfigNacos;
 
 use Hyperf\Collection\Arr;
 use Hyperf\ConfigCenter\AbstractDriver;
 use Hyperf\ConfigCenter\Contract\ClientInterface as ConfigClientInterface;
+use Hyperf\Nacos\Module;
 use Hyperf\Nacos\Protobuf\ListenHandler\ConfigChangeNotifyRequestHandler;
 use Hyperf\Nacos\Protobuf\Response\ConfigQueryResponse;
 use Psr\Container\ContainerInterface;
@@ -43,20 +45,26 @@ class NacosDriver extends AbstractDriver
         $application = $this->client->getClient();
         $listeners = $this->config->get('config_center.drivers.nacos.listener_config', []);
         foreach ($listeners as $key => $item) {
-            $dataId = $item['data_id'];
-            $group = $item['group'];
+            $dataId = $item['data_id'] ?? '';
+            $group = $item['group'] ?? '';
             $tenant = $item['tenant'] ?? '';
             $type = $item['type'] ?? null;
 
-            $client = $application->grpc->get($tenant);
+            $client = $application->grpc->get($tenant, Module::CONFIG);
             $client->listenConfig($group, $dataId, new ConfigChangeNotifyRequestHandler(function (ConfigQueryResponse $response) use ($key, $type) {
-                $this->updateConfig([
-                    $key => $this->client->decode($response->getContent(), $type),
-                ]);
+                $config = $this->client->decode($response->getContent(), $type);
+                $prevConfig = $this->config->get($key, []);
+
+                if ($config !== $prevConfig) {
+                    $this->syncConfig(
+                        [$key => $config],
+                        [$key => $prevConfig],
+                    );
+                }
             }));
         }
 
-        foreach ($application->grpc->getClients() as $client) {
+        foreach ($application->grpc->moduleClients(Module::CONFIG) as $client) {
             $client->listen();
         }
     }

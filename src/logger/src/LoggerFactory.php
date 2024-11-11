@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Logger;
 
 use Hyperf\Collection\Arr;
@@ -112,6 +113,15 @@ class LoggerFactory
         $defaultHandlerConfig = $this->getDefaultHandlerConfig($config);
         $defaultFormatterConfig = $this->getDefaultFormatterConfig($config);
         foreach ($handlerConfigs as $value) {
+            if (is_string($value)) {
+                if (! $this->config->has($group = 'logger.' . $value)) {
+                    continue;
+                }
+                $value = $this->config->get($group . '.handler', []);
+                if ($this->config->has($group . '.formatter')) {
+                    $value['formatter'] = $this->config->get($group . '.formatter', []);
+                }
+            }
             $class = $value['class'] ?? $defaultHandlerConfig['class'];
             $constructor = $value['constructor'] ?? $defaultHandlerConfig['constructor'];
             if (isset($value['formatter'])) {
@@ -127,9 +137,13 @@ class LoggerFactory
         return $handlers;
     }
 
+    /**
+     * @param class-string<HandlerInterface> $class
+     * @param array $constructor
+     * @param array $formatterConfig
+     */
     protected function handler($class, $constructor, $formatterConfig): HandlerInterface
     {
-        /** @var HandlerInterface $handler */
         $handler = make($class, $constructor);
 
         if ($handler instanceof FormattableHandlerInterface) {

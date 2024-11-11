@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Kafka;
 
 use Hyperf\Contract\ConfigInterface;
@@ -19,7 +20,9 @@ use Hyperf\Coroutine\Coroutine;
 use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\Kafka\Annotation\Consumer as ConsumerAnnotation;
 use Hyperf\Kafka\Event\AfterConsume;
+use Hyperf\Kafka\Event\AfterConsumerConfigCreated;
 use Hyperf\Kafka\Event\BeforeConsume;
+use Hyperf\Kafka\Event\BeforeLongLangConsumerCreated;
 use Hyperf\Kafka\Event\FailToConsume;
 use Hyperf\Kafka\Exception\InvalidConsumeResultException;
 use Hyperf\Process\AbstractProcess;
@@ -107,6 +110,7 @@ class ConsumerManager
             {
                 $consumerConfig = $this->getConsumerConfig();
                 $consumer = $this->consumer;
+                $this->dispatcher?->dispatch(new BeforeLongLangConsumerCreated($consumer, $consumerConfig));
                 $longLangConsumer = new LongLangConsumer(
                     $consumerConfig,
                     function (ConsumeMessage $message) use ($consumer, $consumerConfig) {
@@ -114,7 +118,12 @@ class ConsumerManager
                         wait(function () use ($consumer, $consumerConfig, $message) {
                             $this->dispatcher?->dispatch(new BeforeConsume($consumer, $message));
 
-                            $result = $consumer->consume($message);
+                            try {
+                                $result = $consumer->consume($message);
+                            } catch (Throwable $exception) {
+                                $this->dispatcher?->dispatch(new FailToConsume($consumer, $message, $exception));
+                                throw $exception;
+                            }
 
                             if (! $consumerConfig->getAutoCommit()) {
                                 if (! is_string($result)) {
@@ -146,7 +155,6 @@ class ConsumerManager
                         $longLangConsumer->start();
                     } catch (Throwable $exception) {
                         $this->stdoutLogger->warning((string) $exception);
-                        $this->dispatcher?->dispatch(new FailToConsume($this->consumer, [], $exception));
                     }
 
                     if (CoordinatorManager::until(Constants::WORKER_EXIT)->yield(10)) {
@@ -193,6 +201,10 @@ class ConsumerManager
                 $consumerConfig->setPartitionAssignmentStrategy($config['partition_assignment_strategy']);
                 ! empty($config['sasl']) && $consumerConfig->setSasl($config['sasl']);
                 ! empty($config['ssl']) && $consumerConfig->setSsl($config['ssl']);
+                is_callable($config['exception_callback'] ?? null) && $consumerConfig->setExceptionCallback($config['exception_callback']);
+
+                $this->dispatcher?->dispatch(new AfterConsumerConfigCreated($consumerConfig));
+
                 return $consumerConfig;
             }
         };

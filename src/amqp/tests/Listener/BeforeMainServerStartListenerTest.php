@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Amqp\Listener;
 
 use Hyperf\Amqp\ConsumerManager;
@@ -16,6 +17,7 @@ use Hyperf\Amqp\Listener\BeforeMainServerStartListener;
 use Hyperf\Config\Config;
 use Hyperf\Contract\ConfigInterface;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use stdClass;
@@ -24,6 +26,7 @@ use stdClass;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class BeforeMainServerStartListenerTest extends TestCase
 {
     /**

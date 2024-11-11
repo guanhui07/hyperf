@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\ViewEngine;
 
 use Hyperf\Context\ApplicationContext;
@@ -18,6 +19,7 @@ use Hyperf\ViewEngine\Contract\ViewInterface;
 use Hyperf\ViewEngine\Factory\FinderFactory;
 use Hyperf\ViewEngine\HyperfViewEngine;
 use HyperfTest\ViewEngine\Stub\ContainerStub;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 use function Hyperf\ViewEngine\view;
@@ -26,6 +28,7 @@ use function Hyperf\ViewEngine\view;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class BladeTest extends TestCase
 {
     protected function setUp(): void

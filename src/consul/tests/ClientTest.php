@@ -9,18 +9,21 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Consul;
 
 use HyperfTest\Consul\Stub\Client;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 
 /**
  * @internal
- * @covers \Hyperf\Consul\Client
+ * @coversNothing
  */
+#[CoversClass(\Hyperf\Consul\Client::class)]
 class ClientTest extends TestCase
 {
     /**
@@ -40,7 +43,6 @@ class ClientTest extends TestCase
         });
         $reflectionClass = new ReflectionClass(Client::class);
         $method = $reflectionClass->getMethod('resolveOptions');
-        $method->setAccessible(true);
         $this->method = $method;
     }
 

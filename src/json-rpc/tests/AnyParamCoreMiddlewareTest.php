@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\JsonRpc;
 
 use Error;
@@ -46,6 +47,7 @@ use HyperfTest\JsonRpc\Stub\CalculatorService;
 use InvalidArgumentException;
 use Mockery;
 use Monolog\Handler\StreamHandler;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -56,6 +58,7 @@ use Throwable;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class AnyParamCoreMiddlewareTest extends TestCase
 {
     public function testProcess()

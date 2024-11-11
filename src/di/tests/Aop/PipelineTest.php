@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Di\Aop;
 
 use Hyperf\Di\Aop\Pipeline;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
 use HyperfTest\Di\Stub\Aspect\NoProcessAspect;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use WeakReference;
@@ -23,6 +25,7 @@ use WeakReference;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class PipelineTest extends TestCase
 {
     protected function tearDown(): void

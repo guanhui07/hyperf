@@ -9,11 +9,15 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Database\Query\Grammars;
 
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Query\Builder;
+use Hyperf\Database\Query\IndexHint;
+use Hyperf\Database\Query\JoinLateralClause;
 use Hyperf\Database\Query\JsonExpression;
+use Hyperf\Stringable\Str;
 
 use function Hyperf\Collection\collect;
 
@@ -32,6 +36,7 @@ class MySqlGrammar extends Grammar
         'columns',
         'from',
         'joins',
+        'indexHint',
         'wheres',
         'groups',
         'havings',
@@ -68,6 +73,14 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile an insert ignore statement using a subquery into SQL.
+     */
+    public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql): string
+    {
+        return Str::replaceFirst('insert', 'insert ignore', $this->compileInsertUsing($query, $columns, $sql));
+    }
+
+    /**
      * Compile the random statement into SQL.
      *
      * @param string $seed
@@ -79,17 +92,15 @@ class MySqlGrammar extends Grammar
 
     /**
      * Compile an update statement into SQL.
-     *
-     * @param array $values
      */
-    public function compileUpdate(Builder $query, $values): string
+    public function compileUpdate(Builder $query, array $values): string
     {
         $table = $this->wrapTable($query->from);
 
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
         // the values in the list of bindings so we can make the sets statements.
-        $columns = $this->compileUpdateColumns($values);
+        $columns = $this->compileUpdateColumns($query, $values);
 
         // If the query has any "join" clauses, we will setup the joins on the builder
         // and compile them so we can attach them to this update, as update queries
@@ -167,6 +178,14 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "lateral join" clause.
+     */
+    public function compileJoinLateral(JoinLateralClause $join, string $expression): string
+    {
+        return trim("{$join->type} join lateral {$expression} on true");
+    }
+
+    /**
      * Compile a delete statement into SQL.
      */
     public function compileDelete(Builder $query): string
@@ -193,6 +212,18 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the index hints for the query.
+     */
+    protected function compileIndexHint(Builder $query, IndexHint $indexHint): string
+    {
+        return match ($indexHint->type) {
+            'hint' => "use index ({$indexHint->index})",
+            'force' => "force index ({$indexHint->index})",
+            default => "ignore index ({$indexHint->index})",
+        };
+    }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param string $column
@@ -203,6 +234,16 @@ class MySqlGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return 'json_contains(' . $field . ', ' . $value . $path . ')';
+    }
+
+    /**
+     * Compile a "JSON overlaps" statement into SQL.
+     */
+    protected function compileJsonOverlaps(string $column, string $value): string
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+
+        return 'json_overlaps(' . $field . ', ' . $value . $path . ')';
     }
 
     /**
@@ -245,10 +286,8 @@ class MySqlGrammar extends Grammar
 
     /**
      * Compile all of the columns for an update statement.
-     *
-     * @param array $values
      */
-    protected function compileUpdateColumns($values): string
+    protected function compileUpdateColumns(Builder $query, array $values): string
     {
         return collect($values)->map(function ($value, $key) {
             if ($this->isJsonSelector($key)) {
@@ -274,7 +313,7 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a delete query that does not use joins.
      *
-     * @param \Hyperf\Database\Query\Builder $query
+     * @param Builder $query
      * @param string $table
      * @param array $where
      */
@@ -299,7 +338,7 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a delete query that uses joins.
      *
-     * @param \Hyperf\Database\Query\Builder $query
+     * @param Builder $query
      * @param string $table
      * @param array $where
      */

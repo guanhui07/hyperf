@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Scout;
 
 use Hyperf\Context\ApplicationContext;
@@ -18,6 +19,8 @@ use Hyperf\Database\Model\Scope;
 use Hyperf\Scout\Event\ModelsFlushed;
 use Hyperf\Scout\Event\ModelsImported;
 use Psr\EventDispatcher\EventDispatcherInterface;
+
+use function Hyperf\Config\config;
 
 class SearchableScope implements Scope
 {

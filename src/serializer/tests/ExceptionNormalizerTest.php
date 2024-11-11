@@ -9,18 +9,21 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Serializer;
 
 use Hyperf\Serializer\ExceptionNormalizer;
 use HyperfTest\Serializer\Stub\FooException;
 use HyperfTest\Serializer\Stub\SerializableException;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ExceptionNormalizerTest extends TestCase
 {
     public function testInvalidArgumentException()

@@ -9,9 +9,10 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\View;
 
-use Hyperf\Context\Context;
+use Hyperf\Context\ResponseContext;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\Task\Task;
@@ -46,9 +47,9 @@ class Render implements RenderInterface
 
     public function render(string $template, array $data = []): ResponseInterface
     {
-        return $this->response()
-            ->withAddedHeader('content-type', $this->getContentType())
-            ->withBody(new SwooleStream($this->getContents($template, $data)));
+        return ResponseContext::get()
+            ->addHeader('content-type', $this->getContentType())
+            ->setBody(new SwooleStream($this->getContents($template, $data)));
     }
 
     public function getContents(string $template, array $data = []): string
@@ -78,10 +79,5 @@ class Render implements RenderInterface
         $charset = ! empty($this->config['charset']) ? '; charset=' . $this->config['charset'] : '';
 
         return 'text/html' . $charset;
-    }
-
-    protected function response(): ResponseInterface
-    {
-        return Context::get(ResponseInterface::class);
     }
 }

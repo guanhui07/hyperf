@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Amqp;
 
 use Hyperf\Amqp\Builder\QueueBuilder;
@@ -21,7 +22,7 @@ use Throwable;
 
 class RpcClient extends Builder
 {
-    protected $poolChannels = [];
+    protected array $poolChannels = [];
 
     public function __construct(ContainerInterface $container, ConnectionFactory $factory, protected int $maxChannels = 64)
     {
@@ -75,7 +76,7 @@ class RpcClient extends Builder
         return $result;
     }
 
-    protected function initChannel(RpcChannel $channel, QueueBuilder $builder)
+    protected function initChannel(RpcChannel $channel, QueueBuilder $builder): void
     {
         [$queue] = $channel->getChannel()->queue_declare(
             $builder->getQueue(),

@@ -9,14 +9,18 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\ViewEngine\Blade;
 
 use Hyperf\ViewEngine\Exception\ViewCompilationException;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class BladeLoopsTest extends AbstractBladeTestCase
 {
     public function testForelseStatementsAreCompiled()
@@ -94,9 +98,9 @@ empty
     }
 
     /**
-     * @dataProvider invalidForelseStatementsDataProvider
      * @param mixed $initialStatement
      */
+    #[DataProvider('invalidForelseStatementsDataProvider')]
     public function testForelseStatementsThrowHumanizedMessageWhenInvalidStatement($initialStatement)
     {
         $this->expectException(ViewCompilationException::class);
@@ -236,9 +240,7 @@ tag info
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    /**
-     * @dataProvider invalidForeachStatementsDataProvider
-     */
+    #[DataProvider('invalidForeachStatementsDataProvider')]
     public function testForeachStatementsThrowHumanizedMessageWhenInvalidStatement(string $initialStatement)
     {
         $this->expectException(ViewCompilationException::class);

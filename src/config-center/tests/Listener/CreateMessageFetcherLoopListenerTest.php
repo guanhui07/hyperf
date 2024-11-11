@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\ConfigCenter\Listener;
 
 use Hyperf\Config\Config;
@@ -18,6 +19,7 @@ use Hyperf\ConfigCenter\Listener\CreateMessageFetcherLoopListener;
 use Hyperf\ConfigCenter\Mode;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -25,6 +27,7 @@ use stdClass;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class CreateMessageFetcherLoopListenerTest extends TestCase
 {
     protected function tearDown(): void

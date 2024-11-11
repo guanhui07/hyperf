@@ -10,6 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 use Hyperf\Metric\Adapter\Prometheus\Constants;
+use Hyperf\Metric\Adapter\Prometheus\MetricFactory;
 
 use function Hyperf\Support\env;
 
@@ -18,10 +19,14 @@ return [
     'default' => env('METRIC_DRIVER', 'prometheus'),
     'use_standalone_process' => env('METRIC_USE_STANDALONE_PROCESS', true),
     'enable_default_metric' => env('METRIC_ENABLE_DEFAULT_METRIC', true),
+    'enable_command_metric' => env('METRIC_ENABLE_COMMAND_METRIC', true),
     'default_metric_interval' => env('DEFAULT_METRIC_INTERVAL', 5),
+    // only available when use_standalone_process is true
+    'buffer_interval' => env('METRIC_BUFFER_INTERVAL', 5),
+    'buffer_size' => env('METRIC_BUFFER_SIZE', 200),
     'metric' => [
         'prometheus' => [
-            'driver' => Hyperf\Metric\Adapter\Prometheus\MetricFactory::class,
+            'driver' => MetricFactory::class,
             'mode' => Constants::SCRAPE_MODE,
             'namespace' => env('APP_NAME', 'skeleton'),
             'redis_config' => env('PROMETHEUS_REDIS_CONFIG', 'default'),

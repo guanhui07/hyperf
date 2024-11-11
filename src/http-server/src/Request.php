@@ -9,10 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\HttpServer;
 
 use Hyperf\Collection\Arr;
 use Hyperf\Context\Context;
+use Hyperf\Context\RequestContext;
 use Hyperf\HttpMessage\Upload\UploadedFile;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Router\Dispatched;
@@ -24,7 +26,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use RuntimeException;
-use SplFileInfo;
 
 use function Hyperf\Collection\data_get;
 use function Hyperf\Support\value;
@@ -103,7 +104,7 @@ class Request implements RequestInterface
     /**
      * Retrieve the input data from request via multi keys, include query parameters, parsed body and json body.
      */
-    public function inputs(array $keys, array $default = null): array
+    public function inputs(array $keys, ?array $default = null): array
     {
         $data = $this->getInputData();
         $result = [];
@@ -334,8 +335,8 @@ class Request implements RequestInterface
      */
     public function hasFile(string $key): bool
     {
-        if ($file = $this->file($key)) {
-            return $this->isValidFile($file);
+        if ($this->file($key)) {
+            return true;
         }
         return false;
     }
@@ -498,15 +499,6 @@ class Request implements RequestInterface
     }
 
     /**
-     * Check that the given file is a valid SplFileInfo instance.
-     * @param mixed $file
-     */
-    protected function isValidFile($file): bool
-    {
-        return $file instanceof SplFileInfo && $file->getPath() !== '';
-    }
-
-    /**
      * Prepares the path info.
      */
     protected function preparePathInfo(): string
@@ -575,7 +567,7 @@ class Request implements RequestInterface
                 $data = [];
             }
 
-            return array_merge($data, $request->getQueryParams());
+            return $request->getQueryParams() + $data;
         });
     }
 
@@ -609,6 +601,6 @@ class Request implements RequestInterface
 
     protected function getRequest(): ServerRequestInterface
     {
-        return Context::get(ServerRequestInterface::class);
+        return RequestContext::get();
     }
 }

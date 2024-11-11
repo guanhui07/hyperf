@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\View;
 
 use Hyperf\Config\Config;
@@ -22,6 +23,7 @@ use Hyperf\View\Exception\RenderException;
 use Hyperf\View\Mode;
 use Hyperf\View\Render;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -31,6 +33,7 @@ use Throwable;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class RenderTest extends TestCase
 {
     protected function tearDown(): void
@@ -55,11 +58,11 @@ class RenderTest extends TestCase
         ]));
 
         try {
-            $render->getContents('index.tpl', ['title' => 'Hyperf']);
+            $render->getContents('index2.tpl', ['title' => 'Hyperf']);
             $this->assertTrue(false);
         } catch (Throwable $throwable) {
             $this->assertInstanceOf(RenderException::class, $throwable);
-            $this->assertSame('Undefined index: name', $throwable->getMessage());
+            $this->assertSame("Unable to load template 'file:index2.tpl'", $throwable->getMessage());
             $this->assertNotNull($throwable->getPrevious());
         }
     }

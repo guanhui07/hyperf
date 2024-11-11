@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\GrpcServer;
 
 use Closure;
@@ -33,6 +34,7 @@ use Hyperf\RpcServer\Router\DispatcherFactory as RPCDispatcherFactory;
 use Hyperf\RpcServer\Router\RouteCollector;
 use Hyperf\Serializer\SimpleNormalizer;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -40,6 +42,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class CoreMiddlewareTest extends TestCase
 {
     public function testGRPCCoreMiddlewareDispatch()

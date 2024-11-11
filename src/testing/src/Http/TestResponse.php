@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Testing\Http;
 
 use ArrayAccess;
@@ -24,6 +25,7 @@ use Hyperf\Testing\Fluent\AssertableJson;
 use LogicException;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Psr\Http\Message\ResponseInterface;
+use Swow\Psr7\Message\ResponsePlusInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
@@ -354,7 +356,7 @@ class TestResponse implements ArrayAccess
      * @param null|array $responseData
      * @return $this
      */
-    public function assertJsonStructure(array $structure = null, $responseData = null)
+    public function assertJsonStructure(?array $structure = null, $responseData = null)
     {
         $this->decodeResponseJson()->assertStructure($structure, $responseData);
 
@@ -548,9 +550,10 @@ class TestResponse implements ArrayAccess
         $decodedResponse = $testJson->json();
 
         if (is_null($decodedResponse) || $decodedResponse === false) {
-            if ($this->exception ?? null) {
-                throw $this->exception;
-            }
+            $exception = $this->exception ?? null;
+
+            $exception && throw $exception;
+
             PHPUnit::fail('Invalid JSON was returned from the route.');
         }
 
@@ -597,7 +600,7 @@ class TestResponse implements ArrayAccess
         throw new LogicException('Response data may not be mutated using array access.');
     }
 
-    public static function fromBaseResponse(ResponseInterface $response)
+    public static function fromBaseResponse(ResponsePlusInterface $response)
     {
         return new static(new Response($response));
     }

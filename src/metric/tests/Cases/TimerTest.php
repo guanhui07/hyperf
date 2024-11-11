@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Metric\Cases;
 
 use Hyperf\Context\ApplicationContext;
@@ -17,12 +18,14 @@ use Hyperf\Metric\Contract\HistogramInterface;
 use Hyperf\Metric\Contract\MetricFactoryInterface;
 use Hyperf\Metric\Timer;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class TimerTest extends TestCase
 {
     protected function tearDown(): void
@@ -58,7 +61,7 @@ class TimerTest extends TestCase
     private function mockContainer()
     {
         $container = Mockery::mock(Container::class);
-        $container->shouldReceive('make')->with(MetricFactoryInterface::class, [])->andReturn(new class() {
+        $container->shouldReceive('make')->with(MetricFactoryInterface::class, [])->andReturn(new class {
             public function makeHistogram($name, $labels)
             {
                 $histogram = Mockery::mock(HistogramInterface::class);

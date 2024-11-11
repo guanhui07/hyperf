@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Amqp;
 
 use Hyperf\Amqp\Event\AfterConsume;
@@ -54,10 +55,17 @@ class Consumer extends Builder
 
         try {
             $channel = $connection->getConfirmChannel();
+            $exchange = $consumerMessage->getExchange();
 
-            $this->declare($consumerMessage, $channel);
+            try {
+                DeclaredExchanges::add($exchange);
+                $this->declare($consumerMessage, $channel);
+            } catch (Throwable $exception) {
+                DeclaredExchanges::remove($exchange);
+                throw $exception;
+            }
+
             $concurrent = $this->getConcurrent($consumerMessage->getPoolName());
-
             $maxConsumption = $consumerMessage->getMaxConsumption();
             $currentConsumption = 0;
 
@@ -84,7 +92,7 @@ class Consumer extends Builder
                     if ($maxConsumption > 0 && ++$currentConsumption >= $maxConsumption) {
                         break;
                     }
-                } catch (AMQPTimeoutException $exception) {
+                } catch (AMQPTimeoutException) {
                     $this->eventDispatcher?->dispatch(new WaitTimeout($consumerMessage));
                 } catch (Throwable $exception) {
                     $this->logger->error((string) $exception);
@@ -165,17 +173,17 @@ class Consumer extends Builder
     protected function getCallback(ConsumerMessageInterface $consumerMessage, AMQPMessage $message): callable
     {
         return function () use ($consumerMessage, $message) {
-            $data = $consumerMessage->unserialize($message->getBody());
-            /** @var AMQPChannel $channel */
-            $channel = $message->delivery_info['channel'];
-            $deliveryTag = $message->delivery_info['delivery_tag'];
+            $channel = $message->getChannel();
+            $deliveryTag = $message->getDeliveryTag();
 
             try {
-                $this->eventDispatcher?->dispatch(new BeforeConsume($consumerMessage));
+                $data = $consumerMessage->unserialize($message->getBody());
+
+                $this->eventDispatcher?->dispatch(new BeforeConsume($consumerMessage, $message));
                 $result = $consumerMessage->consumeMessage($data, $message);
-                $this->eventDispatcher?->dispatch(new AfterConsume($consumerMessage, $result));
+                $this->eventDispatcher?->dispatch(new AfterConsume($consumerMessage, $result, $message));
             } catch (Throwable $exception) {
-                $this->eventDispatcher?->dispatch(new FailToConsume($consumerMessage, $exception));
+                $this->eventDispatcher?->dispatch(new FailToConsume($consumerMessage, $exception, $message));
                 if ($this->container->has(FormatterInterface::class)) {
                     $formatter = $this->container->get(FormatterInterface::class);
                     $this->logger->error($formatter->format($exception));
@@ -192,7 +200,7 @@ class Consumer extends Builder
                 return;
             }
             if ($result === Result::NACK) {
-                $this->logger->debug($deliveryTag . ' uacked.');
+                $this->logger->debug($deliveryTag . ' nacked.');
                 $channel->basic_nack($deliveryTag, false, $consumerMessage->isRequeue());
                 return;
             }

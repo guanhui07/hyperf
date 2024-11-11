@@ -9,12 +9,19 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Crontab;
 
 use Hyperf\Crontab\Parser;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
+/**
+ * @internal
+ * @coversNothing
+ */
+#[CoversNothing]
 /**
  * @internal
  * @coversNothing
@@ -38,7 +45,6 @@ class ParserCronNumberTest extends TestCase
     {
         $parser = new Parser();
         $reflectionMethod = new ReflectionMethod(Parser::class, 'parseSegment');
-        $reflectionMethod->setAccessible(true);
 
         $result = $reflectionMethod->invoke($parser, '*', 0, 59);
         $expected = [];
@@ -70,7 +76,6 @@ class ParserCronNumberTest extends TestCase
     {
         $parser = new Parser();
         $reflectionMethod = new ReflectionMethod(Parser::class, 'parseSegment');
-        $reflectionMethod->setAccessible(true);
 
         $result = $reflectionMethod->invoke($parser, '*', 0, 59, 12);
         $expected = [];

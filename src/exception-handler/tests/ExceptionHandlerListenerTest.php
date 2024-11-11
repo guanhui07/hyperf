@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\ExceptionHandler;
 
 use Hyperf\Config\Config;
@@ -16,6 +17,7 @@ use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\ExceptionHandler\Annotation\ExceptionHandler;
 use Hyperf\ExceptionHandler\Listener\ExceptionHandlerListener;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -23,6 +25,7 @@ use stdClass;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ExceptionHandlerListenerTest extends TestCase
 {
     protected function tearDown(): void

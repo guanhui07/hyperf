@@ -9,10 +9,17 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\ViewEngine\Blade;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversNothing;
 
+/**
+ * @internal
+ * @coversNothing
+ */
+#[CoversNothing]
 /**
  * @internal
  * @coversNothing
@@ -200,7 +207,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.input', 'input');
 
         $string = '@input';
-        $expected = '<?php echo $__env->make(\'app.includes.input\', [], \Hyperf\Utils\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [], \Hyperf\Collection\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -209,7 +216,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.input', 'input');
 
         $string = '@input([\'type\' => \'email\'])';
-        $expected = '<?php echo $__env->make(\'app.includes.input\', [\'type\' => \'email\'], \Hyperf\Utils\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [\'type\' => \'email\'], \Hyperf\Collection\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -218,7 +225,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.input');
 
         $string = '@input';
-        $expected = '<?php echo $__env->make(\'app.includes.input\', [], \Hyperf\Utils\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [], \Hyperf\Collection\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -227,7 +234,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.foreach');
 
         $string = '@foreach';
-        $expected = '<?php echo $__env->make(\'app.includes.foreach\', [], \Hyperf\Utils\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.foreach\', [], \Hyperf\Collection\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 

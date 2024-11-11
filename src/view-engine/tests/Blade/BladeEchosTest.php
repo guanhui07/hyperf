@@ -9,12 +9,16 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\ViewEngine\Blade;
+
+use PHPUnit\Framework\Attributes\CoversNothing;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class BladeEchosTest extends AbstractBladeTestCase
 {
     public function testEchosAreCompiled()
@@ -98,7 +102,7 @@ class BladeEchosTest extends AbstractBladeTestCase
     public function testBladeHandlerCanInterceptRegularEchos()
     {
         $this->assertSame(
-            '<?php echo \\Hyperf\\ViewEngine\\T::e($exampleObject); ?>',
+            '<?php echo \Hyperf\ViewEngine\T::e($exampleObject); ?>',
             $this->compiler->compileString('{{$exampleObject}}')
         );
     }

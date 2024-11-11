@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\AsyncQueue\Driver;
 
 use Hyperf\AsyncQueue\Event\AfterHandle;
@@ -57,6 +58,7 @@ abstract class Driver implements DriverInterface
 
         while (ProcessManager::isRunning()) {
             try {
+                /** @var MessageInterface $message */
                 [$data, $message] = $this->pop();
 
                 if ($data === false) {
@@ -95,6 +97,10 @@ abstract class Driver implements DriverInterface
         }
     }
 
+    /**
+     * @param mixed $data
+     * @param MessageInterface $message
+     */
     protected function getCallback($data, $message): callable
     {
         return function () use ($data, $message) {
@@ -114,6 +120,7 @@ abstract class Driver implements DriverInterface
                     } else {
                         $this->event?->dispatch(new FailedHandle($message, $ex));
                         $this->fail($data);
+                        $message->job()->fail($ex);
                     }
                 }
             }

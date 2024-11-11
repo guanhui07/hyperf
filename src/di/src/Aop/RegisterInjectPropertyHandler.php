@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Di\Aop;
 
 use Hyperf\Context\ApplicationContext;
@@ -35,7 +36,6 @@ class RegisterInjectPropertyHandler
             if ($annotation instanceof Inject) {
                 try {
                     $reflectionProperty = ReflectionManager::reflectProperty($currentClassName, $property);
-                    $reflectionProperty->setAccessible(true);
                     $container = ApplicationContext::getContainer();
                     if ($container->has($annotation->value)) {
                         $reflectionProperty->setValue($object, $container->get($annotation->value));

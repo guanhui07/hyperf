@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\GrpcClient;
 
 use Hyperf\Context\ApplicationContext;
@@ -18,6 +19,7 @@ use Hyperf\GrpcClient\Exception\GrpcClientException;
 use Hyperf\GrpcClient\StreamingCall;
 use HyperfTest\GrpcClient\Stub\RouteGuideClient;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Routeguide\Point;
 use Routeguide\Rectangle;
@@ -28,6 +30,7 @@ use Routeguide\RouteSummary;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class RouteGuideClientTest extends TestCase
 {
     protected function setUp(): void

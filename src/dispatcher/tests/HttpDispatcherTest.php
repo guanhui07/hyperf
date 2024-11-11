@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Dispatcher;
 
 use Hyperf\Context\ApplicationContext;
@@ -19,25 +20,19 @@ use HyperfTest\Dispatcher\Middlewares\CoreMiddleware;
 use HyperfTest\Dispatcher\Middlewares\Test2Middleware;
 use HyperfTest\Dispatcher\Middlewares\TestMiddleware;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Prophecy\ProphecyInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * @property ProphecyInterface container
- * @property ProphecyInterface request
- * @property ProphecyInterface response
- *
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class HttpDispatcherTest extends TestCase
 {
-    use ProphecyTrait;
-
     protected function tearDown(): void
     {
         Mockery::close();

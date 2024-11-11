@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\ConfigCenter;
 
 use Hyperf\Codec\Json;
@@ -31,7 +32,7 @@ class ContainerStub
         $container = Mockery::mock(Container::class);
         ApplicationContext::setContainer($container);
 
-        $container->shouldReceive('get')->with(EventDispatcherInterface::class)->andReturn(new class() {
+        $container->shouldReceive('get')->with(EventDispatcherInterface::class)->andReturn(new class {
             public function dispatch()
             {
                 return true;

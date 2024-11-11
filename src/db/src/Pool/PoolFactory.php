@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\DB\Pool;
 
 use Hyperf\Contract\ConfigInterface;
@@ -38,7 +39,7 @@ class PoolFactory
         }
 
         $config = $this->container->get(ConfigInterface::class);
-        $driver = $config->get(sprintf('db.%s.driver', $name), 'pdo');
+        $driver = $config->get(sprintf('db.%s.driver', $name), 'mysql');
         $class = $this->getPoolName($driver);
         $pool = make($class, [$this->container, $name]);
 
@@ -52,8 +53,7 @@ class PoolFactory
     protected function getPoolName(string $driver): string
     {
         return match (strtolower($driver)) {
-            'mysql' => MySQLPool::class,
-            'pdo' => PDOPool::class,
+            'mysql', 'pdo' => MySQLPool::class,
             'pgsql' => PgSQLPool::class,
             default => class_exists($driver) ? $driver : throw new DriverNotFoundException(sprintf('Driver %s is not found.', $driver)),
         };

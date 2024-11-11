@@ -9,12 +9,15 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\HttpServer;
 
 use Closure;
 use FastRoute\Dispatcher;
 use Hyperf\Codec\Json;
 use Hyperf\Context\Context;
+use Hyperf\Context\RequestContext;
+use Hyperf\Context\ResponseContext;
 use Hyperf\Contract\Arrayable;
 use Hyperf\Contract\Jsonable;
 use Hyperf\Contract\NormalizerInterface;
@@ -24,6 +27,7 @@ use Hyperf\Di\ReflectionType;
 use Hyperf\HttpMessage\Exception\MethodNotAllowedHttpException;
 use Hyperf\HttpMessage\Exception\NotFoundHttpException;
 use Hyperf\HttpMessage\Exception\ServerErrorHttpException;
+use Hyperf\HttpMessage\Server\ResponsePlusProxy;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\HttpServer\Contract\CoreMiddlewareInterface;
 use Hyperf\HttpServer\Router\Dispatched;
@@ -35,6 +39,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
+use Swow\Psr7\Message\ResponsePlusInterface;
 
 /**
  * Core middleware of Hyperf, main responsibility is used to handle route info
@@ -52,7 +57,7 @@ class CoreMiddleware implements CoreMiddlewareInterface
 
     private NormalizerInterface $normalizer;
 
-    public function __construct(protected ContainerInterface $container, string $serverName)
+    public function __construct(protected ContainerInterface $container, private string $serverName)
     {
         $this->dispatcher = $this->createDispatcher($serverName);
         $this->normalizer = $this->container->get(NormalizerInterface::class);
@@ -66,9 +71,9 @@ class CoreMiddleware implements CoreMiddlewareInterface
     {
         $routes = $this->dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());
 
-        $dispatched = new Dispatched($routes);
+        $dispatched = new Dispatched($routes, $this->serverName);
 
-        return Context::set(ServerRequestInterface::class, $request->withAttribute(Dispatched::class, $dispatched));
+        return RequestContext::set($request)->setAttribute(Dispatched::class, $dispatched);
     }
 
     /**
@@ -77,7 +82,7 @@ class CoreMiddleware implements CoreMiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $request = Context::set(ServerRequestInterface::class, $request);
+        $request = RequestContext::set($request);
 
         /** @var Dispatched $dispatched */
         $dispatched = $request->getAttribute(Dispatched::class);
@@ -93,10 +98,11 @@ class CoreMiddleware implements CoreMiddlewareInterface
             default => null,
         };
 
-        if (! $response instanceof ResponseInterface) {
+        if (! $response instanceof ResponsePlusInterface) {
             $response = $this->transferToResponse($response, $request);
         }
-        return $response->withAddedHeader('Server', 'Hyperf');
+
+        return $response->addHeader('Server', 'Hyperf');
     }
 
     public function getMethodDefinitionCollector(): MethodDefinitionCollectorInterface
@@ -160,7 +166,7 @@ class CoreMiddleware implements CoreMiddlewareInterface
         throw new MethodNotAllowedHttpException('Allow: ' . implode(', ', $methods));
     }
 
-    protected function prepareHandler(string|array $handler): array
+    protected function prepareHandler(array|string $handler): array
     {
         if (is_string($handler)) {
             if (str_contains($handler, '@')) {
@@ -180,39 +186,43 @@ class CoreMiddleware implements CoreMiddlewareInterface
     /**
      * Transfer the non-standard response content to a standard response object.
      *
-     * @param null|array|Arrayable|Jsonable|string $response
+     * @param null|array|Arrayable|Jsonable|ResponseInterface|string $response
      */
-    protected function transferToResponse($response, ServerRequestInterface $request): ResponseInterface
+    protected function transferToResponse($response, ServerRequestInterface $request): ResponsePlusInterface
     {
         if (is_string($response)) {
-            return $this->response()->withAddedHeader('content-type', 'text/plain')->withBody(new SwooleStream($response));
+            return $this->response()->addHeader('content-type', 'text/plain')->setBody(new SwooleStream($response));
+        }
+
+        if ($response instanceof ResponseInterface) {
+            return new ResponsePlusProxy($response);
         }
 
         if (is_array($response) || $response instanceof Arrayable) {
             return $this->response()
-                ->withAddedHeader('content-type', 'application/json')
-                ->withBody(new SwooleStream(Json::encode($response)));
+                ->addHeader('content-type', 'application/json')
+                ->setBody(new SwooleStream(Json::encode($response)));
         }
 
         if ($response instanceof Jsonable) {
             return $this->response()
-                ->withAddedHeader('content-type', 'application/json')
-                ->withBody(new SwooleStream((string) $response));
+                ->addHeader('content-type', 'application/json')
+                ->setBody(new SwooleStream((string) $response));
         }
 
         if ($this->response()->hasHeader('content-type')) {
-            return $this->response()->withBody(new SwooleStream((string) $response));
+            return $this->response()->setBody(new SwooleStream((string) $response));
         }
 
-        return $this->response()->withHeader('content-type', 'text/plain')->withBody(new SwooleStream((string) $response));
+        return $this->response()->addHeader('content-type', 'text/plain')->setBody(new SwooleStream((string) $response));
     }
 
     /**
      * Get response instance from context.
      */
-    protected function response(): ResponseInterface
+    protected function response(): ResponsePlusInterface
     {
-        return Context::get(ResponseInterface::class);
+        return ResponseContext::get();
     }
 
     /**

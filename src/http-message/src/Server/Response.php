@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\HttpMessage\Server;
 
 use Hyperf\Engine\Contract\Http\Writable;
@@ -48,6 +49,15 @@ class Response extends \Hyperf\HttpMessage\Base\Response implements Chunkable
     }
 
     /**
+     * Returns an instance with specified cookies.
+     */
+    public function setCookie(Cookie $cookie): static
+    {
+        $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
+        return $this;
+    }
+
+    /**
      * Retrieves all cookies.
      */
     public function getCookies(): array
@@ -59,7 +69,7 @@ class Response extends \Hyperf\HttpMessage\Base\Response implements Chunkable
      * Returns an instance with specified trailer.
      * @param string $value
      */
-    public function withTrailer(string $key, $value): static
+    public function withTrailer(string $key, mixed $value): static
     {
         $new = clone $this;
         $new->trailers[$key] = $value;
@@ -82,13 +92,13 @@ class Response extends \Hyperf\HttpMessage\Base\Response implements Chunkable
         return $this->trailers;
     }
 
-    public function setConnection(ConnectionInterface|Writable $connection)
+    public function setConnection(Writable $connection)
     {
         $this->connection = $connection;
         return $this;
     }
 
-    public function getConnection(): ConnectionInterface|Writable|null
+    public function getConnection(): ?Writable
     {
         return $this->connection;
     }

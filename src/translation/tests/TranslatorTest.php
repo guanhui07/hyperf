@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Translation;
 
 use Countable;
@@ -22,11 +23,17 @@ use Hyperf\Translation\MessageSelector;
 use Hyperf\Translation\Translator;
 use Hyperf\Translation\TranslatorFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 use function Hyperf\Coroutine\parallel;
 
+/**
+ * @internal
+ * @coversNothing
+ */
+#[CoversNothing]
 /**
  * @internal
  * @coversNothing
@@ -49,7 +56,6 @@ class TranslatorTest extends TestCase
         $loader = $factory($container);
         $ref = new ReflectionClass($loader);
         $locale = $ref->getProperty('locale');
-        $locale->setAccessible(true);
         $this->assertSame('zh_CN', $locale->getValue($loader));
     }
 
@@ -331,7 +337,7 @@ class TranslatorTest extends TestCase
     public function testIsCountable()
     {
         $this->assertTrue(is_countable([]));
-        $this->assertTrue(is_countable(new class() implements Countable {
+        $this->assertTrue(is_countable(new class implements Countable {
             public function count()
             {
                 return 0;

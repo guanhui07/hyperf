@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Nacos;
 
 use Hyperf\Context\ApplicationContext;
@@ -18,7 +19,7 @@ use Psr\Container\ContainerInterface;
 class GrpcFactory
 {
     /**
-     * @var array<string, GrpcClient>
+     * @var array<string, array<string, GrpcClient>>
      */
     protected array $clients = [];
 
@@ -29,21 +30,43 @@ class GrpcFactory
         }
     }
 
-    public function get(string $namespaceId): GrpcClient
+    public function get(string $namespaceId, Module|string $module = 'config'): GrpcClient
     {
-        if (isset($this->clients[$namespaceId])) {
-            return $this->clients[$namespaceId];
+        $module instanceof Module && $module = $module->value;
+
+        if (isset($this->clients[$namespaceId][$module])) {
+            return $this->clients[$namespaceId][$module];
         }
 
-        return $this->clients[$namespaceId] = new GrpcClient($this->app, $this->config, $this->container(), $namespaceId);
+        return $this->clients[$namespaceId][$module] = new GrpcClient($this->app, $this->config, $this->container(), $namespaceId, $module);
     }
 
     /**
-     * @return GrpcClient[]
+     * @return array<string, array<string, GrpcClient>> array<namespaceId, <module, GrpcClient>>
      */
     public function getClients(): array
     {
         return $this->clients;
+    }
+
+    /**
+     * @param string $module config or naming
+     * @return array<string, GrpcClient> array<namespaceId, GrpcClient>
+     */
+    public function moduleClients(Module|string $module): array
+    {
+        $module instanceof Module && $module = $module->value;
+
+        $result = [];
+        foreach ($this->clients as $namespaceId => $clients) {
+            foreach ($clients as $key => $client) {
+                if ($key === $module) {
+                    $result[$namespaceId] = $client;
+                }
+            }
+        }
+
+        return $result;
     }
 
     private function container(): ContainerInterface

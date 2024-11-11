@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Signal;
 
 use Hyperf\Contract\ConfigInterface;
@@ -17,8 +18,8 @@ use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\Engine\Signal as EngineSignal;
 use Hyperf\Signal\Annotation\Signal;
 use Hyperf\Signal\SignalHandlerInterface as SignalHandler;
+use Hyperf\Stdlib\SplPriorityQueue;
 use Psr\Container\ContainerInterface;
-use SplPriorityQueue;
 
 class SignalManager
 {
@@ -39,7 +40,7 @@ class SignalManager
     public function init()
     {
         foreach ($this->getQueue() as $class) {
-            /** @var SignalHandlerInterface $handler */
+            /** @var SignalHandler $handler */
             $handler = $this->container->get($class);
             foreach ($handler->listen() as [$process, $signal]) {
                 if ($process & SignalHandler::WORKER) {

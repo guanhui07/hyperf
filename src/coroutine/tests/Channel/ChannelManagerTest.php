@@ -9,10 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Coroutine\Channel;
 
 use Hyperf\Coroutine\Channel\Manager as ChannelManager;
 use Hyperf\Engine\Channel;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 use function Hyperf\Coroutine\go;
@@ -21,6 +23,7 @@ use function Hyperf\Coroutine\go;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ChannelManagerTest extends TestCase
 {
     public function testChannelManager()

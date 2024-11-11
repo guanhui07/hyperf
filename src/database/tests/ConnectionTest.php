@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Database;
 
 use Hyperf\Database\Connection;
@@ -16,6 +17,7 @@ use Hyperf\Database\Query\Expression;
 use Hyperf\Database\Query\Grammars\MySqlGrammar;
 use Mockery;
 use PDO;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 use function Hyperf\Support\build_sql;
@@ -24,6 +26,7 @@ use function Hyperf\Support\build_sql;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ConnectionTest extends TestCase
 {
     protected function tearDown(): void

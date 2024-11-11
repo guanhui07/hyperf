@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Coroutine;
 
 use Exception;
 use Hyperf\Coroutine\Coroutine;
 use Hyperf\Coroutine\Exception\ParallelExecutionException;
 use Hyperf\Coroutine\Parallel;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Throwable;
@@ -23,8 +25,9 @@ use function Hyperf\Coroutine\parallel;
 
 /**
  * @internal
- * @covers \Hyperf\Coroutine\Parallel
+ * @coversNothing
  */
+#[CoversClass(Parallel::class)]
 class ParallelTest extends TestCase
 {
     public function testParallel()

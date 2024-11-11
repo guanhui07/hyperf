@@ -16,3 +16,6 @@ vendor/
 node_modules/*
 *.cache
 .bashrc
+/phpstan.neon
+/phpunit.xml
+!/src/support/tests/envs/**/*.env

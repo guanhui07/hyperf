@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\HttpMessage\Upload;
 
 use Hyperf\HttpMessage\Stream\StandardStream;
@@ -17,8 +18,9 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use RuntimeException;
 use SplFileInfo;
+use Stringable;
 
-class UploadedFile extends SplFileInfo implements UploadedFileInterface
+class UploadedFile extends SplFileInfo implements UploadedFileInterface, Stringable
 {
     /**
      * @var int[]

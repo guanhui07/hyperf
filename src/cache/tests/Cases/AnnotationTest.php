@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Cache\Cases;
 
 use Hyperf\Cache\Annotation\Cacheable;
@@ -18,12 +19,14 @@ use Hyperf\Cache\AnnotationManager;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class AnnotationTest extends TestCase
 {
     public function testIntCacheableAndCachePut()
@@ -67,10 +70,10 @@ class AnnotationTest extends TestCase
 
     public function testAnnotationManager()
     {
-        $cacheable = new Cacheable('test', ttl: 3600, offset: 100);
-        $cacheable2 = new Cacheable('test', ttl: 3600);
-        $cacheput = new CachePut('test', ttl: 3600, offset: 100);
-        $cacheahead = new CacheAhead('test', ttl: 3600, aheadSeconds: 600, lockSeconds: 20);
+        $cacheable = new Cacheable('test', ttl: 3600, offset: 100, skipCacheResults: []);
+        $cacheable2 = new Cacheable('test', ttl: 3600, skipCacheResults: []);
+        $cacheput = new CachePut('test', ttl: 3600, offset: 100, skipCacheResults: []);
+        $cacheahead = new CacheAhead('test', ttl: 3600, aheadSeconds: 600, lockSeconds: 20, skipCacheResults: []);
 
         $config = Mockery::mock(ConfigInterface::class);
         $logger = Mockery::mock(StdoutLoggerInterface::class);

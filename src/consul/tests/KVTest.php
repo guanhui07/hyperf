@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Consul;
 
 use Exception;
@@ -21,13 +22,15 @@ use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Di\Container;
 use Hyperf\Guzzle\ClientFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 /**
  * @internal
- * @covers \Hyperf\Consul\KV
+ * @coversNothing
  */
+#[CoversClass(KV::class)]
 class KVTest extends TestCase
 {
     private $kv;

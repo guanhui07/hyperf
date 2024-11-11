@@ -9,21 +9,24 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Collection;
 
 /**
- * @mixin \Hyperf\Collection\Collection
- * Most of the methods in this file come from illuminate/collections,
- * thanks Laravel Team provide such a useful class.
+ * @template TKey of array-key
+ * @template TValue
+ *
+ * @mixin Enumerable
+ * @mixin TValue
  */
 class HigherOrderCollectionProxy
 {
     /**
      * Create a new proxy instance.
-     * @param Collection $collection the collection being operated on
+     * @param Enumerable<TKey, TValue> $collection the collection being operated on
      * @param string $method the method being proxied
      */
-    public function __construct(protected Collection $collection, protected string $method)
+    public function __construct(protected Enumerable $collection, protected string $method)
     {
     }
 

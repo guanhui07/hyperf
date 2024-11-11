@@ -9,16 +9,20 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Serializer;
 
+use ArrayObject;
 use Doctrine\Instantiator\Instantiator;
 use Hyperf\Di\ReflectionManager;
+use Hyperf\Serializer\Contract\CacheableSupportsMethodInterface;
+use ReflectionException;
 use RuntimeException;
 use Serializable;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Throwable;
+use TypeError;
 
 use function get_class;
 
@@ -26,7 +30,7 @@ class ExceptionNormalizer implements NormalizerInterface, DenormalizerInterface,
 {
     protected ?Instantiator $instantiator = null;
 
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (is_string($data)) {
             $ex = unserialize($data);
@@ -43,18 +47,17 @@ class ExceptionNormalizer implements NormalizerInterface, DenormalizerInterface,
                 foreach (['code', 'message', 'file', 'line'] as $attribute) {
                     if (isset($data[$attribute])) {
                         $property = ReflectionManager::reflectProperty($type, $attribute);
-                        $property->setAccessible(true);
                         $property->setValue($exception, $data[$attribute]);
                     }
                 }
                 return $exception;
-            } catch (\ReflectionException) {
+            } catch (ReflectionException) {
                 return new RuntimeException(sprintf(
                     'Bad data %s: %s',
                     $data['class'],
                     $data['message']
                 ), $data['code']);
-            } catch (\TypeError) {
+            } catch (TypeError) {
                 return new RuntimeException(sprintf(
                     'Uncaught data %s: %s',
                     $data['class'],
@@ -66,12 +69,12 @@ class ExceptionNormalizer implements NormalizerInterface, DenormalizerInterface,
         return new RuntimeException('Bad data data: ' . json_encode($data));
     }
 
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return class_exists($type) && is_a($type, Throwable::class, true);
     }
 
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize(mixed $object, ?string $format = null, array $context = []): null|array|ArrayObject|bool|float|int|string
     {
         if ($object instanceof Serializable) {
             return serialize($object);
@@ -85,7 +88,7 @@ class ExceptionNormalizer implements NormalizerInterface, DenormalizerInterface,
         ];
     }
 
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof Throwable;
     }
@@ -93,6 +96,11 @@ class ExceptionNormalizer implements NormalizerInterface, DenormalizerInterface,
     public function hasCacheableSupportsMethod(): bool
     {
         return get_class($this) === __CLASS__;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['object' => static::class === __CLASS__];
     }
 
     protected function getInstantiator(): Instantiator

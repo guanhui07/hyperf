@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Pool;
 
 use Closure;
@@ -161,15 +162,6 @@ abstract class KeepaliveConnection implements ConnectionInterface
                 }
             }
         });
-    }
-
-    /**
-     * @deprecated
-     * @return int ms
-     */
-    protected function getHeartbeat(): int
-    {
-        return $this->getHeartbeatSeconds() * 1000;
     }
 
     /**

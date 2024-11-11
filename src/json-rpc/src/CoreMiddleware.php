@@ -9,14 +9,16 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\JsonRpc;
 
 use Closure;
 use Hyperf\HttpServer\Router\Dispatched;
 use Hyperf\Rpc\Protocol;
+use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Swow\Psr7\Message\ResponsePlusInterface;
 use Throwable;
 
 class CoreMiddleware extends \Hyperf\RpcServer\CoreMiddleware
@@ -44,7 +46,7 @@ class CoreMiddleware extends \Hyperf\RpcServer\CoreMiddleware
 
             try {
                 $parameters = $this->parseMethodParameters($controller, $action, $request->getParsedBody());
-            } catch (\InvalidArgumentException) {
+            } catch (InvalidArgumentException) {
                 return $this->responseBuilder->buildErrorResponse($request, ResponseBuilder::INVALID_PARAMS);
             }
 
@@ -70,7 +72,7 @@ class CoreMiddleware extends \Hyperf\RpcServer\CoreMiddleware
         return $this->handleNotFound($request);
     }
 
-    protected function transferToResponse($response, ServerRequestInterface $request): ResponseInterface
+    protected function transferToResponse($response, ServerRequestInterface $request): ResponsePlusInterface
     {
         return $this->responseBuilder->buildResponse($request, $response);
     }

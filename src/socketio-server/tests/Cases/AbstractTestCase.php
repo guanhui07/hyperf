@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\SocketIOServer\Cases;
 
 use Hyperf\Config\Config;
@@ -18,6 +19,7 @@ use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Di\Container;
 use Hyperf\Di\Definition\DefinitionSource;
 use Hyperf\Framework\Logger\StdoutLogger;
+use Hyperf\SocketIOServer\Atomic;
 use Hyperf\SocketIOServer\Parser\Encoder;
 use Hyperf\SocketIOServer\Room\AdapterInterface;
 use Hyperf\SocketIOServer\Room\MemoryAdapter;
@@ -28,7 +30,6 @@ use Hyperf\SocketIOServer\SidProvider\SidProviderInterface;
 use Hyperf\SocketIOServer\SocketIO;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Swoole\Atomic;
 use Swoole\Timer;
 
 /**

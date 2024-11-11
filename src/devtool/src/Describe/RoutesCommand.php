@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Devtool\Describe;
 
 use Hyperf\Command\Annotation\Command;
@@ -96,12 +97,14 @@ class RoutesCommand extends HyperfCommand
             $middlewares = $this->config->get('middlewares.' . $serverName, []);
 
             $middlewares = array_merge($middlewares, $registeredMiddlewares);
+            $middlewares = MiddlewareManager::sortMiddlewares($middlewares);
+
             $data[$unique] = [
                 'server' => $serverName,
                 'method' => [$method],
                 'uri' => $uri,
                 'action' => $action,
-                'middleware' => implode(PHP_EOL, array_unique($middlewares)),
+                'middleware' => implode(PHP_EOL, $middlewares),
             ];
         }
     }

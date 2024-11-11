@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Testing;
 
 use Hyperf\Codec\Packer\JsonPacker;
@@ -44,7 +45,7 @@ class Client extends Server
 
     protected string $baseUri = 'http://127.0.0.1/';
 
-    public function __construct(ContainerInterface $container, PackerInterface $packer = null, $server = 'http')
+    public function __construct(ContainerInterface $container, ?PackerInterface $packer = null, $server = 'http')
     {
         parent::__construct(
             $container,
@@ -197,14 +198,6 @@ class Client extends Server
             ->withUploadedFiles($this->normalizeFiles($multipart));
     }
 
-    /**
-     * @deprecated It will be removed in v3.0
-     */
-    protected function init(string $method, string $path, array $options = []): ServerRequestInterface
-    {
-        return $this->initRequest($method, $path, $options);
-    }
-
     protected function execute(ServerRequestInterface $psr7Request): ResponseInterface
     {
         $this->persistToContext($psr7Request, new Psr7Response());
@@ -217,6 +210,8 @@ class Client extends Server
             $registeredMiddlewares = MiddlewareManager::get($this->serverName, $dispatched->handler->route, $psr7Request->getMethod());
             $middlewares = array_merge($middlewares, $registeredMiddlewares);
         }
+
+        $middlewares = MiddlewareManager::sortMiddlewares($middlewares);
 
         try {
             $psr7Response = $this->dispatcher->dispatch($psr7Request, $middlewares, $this->coreMiddleware);

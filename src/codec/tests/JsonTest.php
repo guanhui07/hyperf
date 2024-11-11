@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Codec;
 
 use Hyperf\Codec\Exception\InvalidArgumentException;
 use Hyperf\Codec\Json;
 use HyperfTest\Codec\Stub\Car;
 use HyperfTest\Codec\Stub\StringCodeException;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -24,6 +26,7 @@ use function Hyperf\Coroutine\go;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class JsonTest extends TestCase
 {
     public function testEncode()

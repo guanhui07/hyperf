@@ -10,20 +10,20 @@ composer require hyperf/async-queue
 
 ## 配置
 
-配置文件位于 `config/autoload/async_queue.php`，如文件不存在可自行创建。
+配置文件位于 `config/autoload/async_queue.php`，如该文件不存在，可通过 `php bin/hyperf.php vendor:publish hyperf/async-queue` 命令来将发布对应的配置文件。
 
 > 暂时只支持 `Redis Driver` 驱动。
 
 |       配置       |   类型    |                   默认值                    |                  备注                   |
-|:----------------:|:---------:|:-------------------------------------------:|:---------------------------------------:|
+| :--------------: | :-------: | :-----------------------------------------: | :-------------------------------------: |
 |      driver      |  string   | Hyperf\AsyncQueue\Driver\RedisDriver::class |                   无                    |
 |     channel      |  string   |                    queue                    |                队列前缀                 |
-|    redis.pool    |  string   |                    default                  |                redis 连接池              |
+|    redis.pool    |  string   |                   default                   |              redis 连接池               |
 |     timeout      |    int    |                      2                      |           pop 消息的超时时间            |
 |  retry_seconds   | int,array |                      5                      |           失败后重新尝试间隔            |
 |  handle_timeout  |    int    |                     10                      |            消息处理超时时间             |
 |    processes     |    int    |                      1                      |               消费进程数                |
-| concurrent.limit |    int    |                      1                      |             同时处理消息数              |
+| concurrent.limit |    int    |                     10                      |             同时处理消息数              |
 |   max_messages   |    int    |                      0                      | 进程重启所需最大处理的消息数 默认不重启 |
 
 ```php
@@ -41,8 +41,9 @@ return [
         'handle_timeout' => 10,
         'processes' => 1,
         'concurrent' => [
-            'limit' => 5,
+            'limit' => 10,
         ],
+        'max_messages' => 0,
     ],
 ];
 
@@ -112,6 +113,65 @@ use Hyperf\Process\Annotation\Process;
 #[Process(name: "async-queue")]
 class AsyncQueueConsumer extends ConsumerProcess
 {
+}
+```
+
+### 如何使用多个配置
+
+有的开发者会在特殊场景创建多个配置，比如某些消息要优先处理，所以会放到更加清闲的队列当中。例如以下配置
+
+```php
+<?php
+
+return [
+    'default' => [
+        'driver' => Hyperf\AsyncQueue\Driver\RedisDriver::class,
+        'redis' => [
+            'pool' => 'default'
+        ],
+        'channel' => 'queue',
+        'timeout' => 2,
+        'retry_seconds' => 5,
+        'handle_timeout' => 10,
+        'processes' => 1,
+        'concurrent' => [
+            'limit' => 5,
+        ],
+    ],
+    'fast' => [
+        'driver' => Hyperf\AsyncQueue\Driver\RedisDriver::class,
+        'redis' => [
+            'pool' => 'default'
+        ],
+        'channel' => '{queue:fast}',
+        'timeout' => 2,
+        'retry_seconds' => 5,
+        'handle_timeout' => 10,
+        'processes' => 1,
+        'concurrent' => [
+            'limit' => 5,
+        ],
+    ],
+];
+
+```
+
+但是，我们默认的 `Hyperf\AsyncQueue\Process\ConsumerProcess` 只会处理 `default` 配置，所以我们需要创建一个新的 `Process`
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Process;
+
+use Hyperf\AsyncQueue\Process\ConsumerProcess;
+use Hyperf\Process\Annotation\Process;
+
+#[Process(name: "async-queue")]
+class AsyncQueueConsumer extends ConsumerProcess
+{
+    protected string $queue = 'fast';
 }
 ```
 
@@ -316,11 +376,8 @@ use Hyperf\HttpServer\Annotation\AutoController;
 #[AutoController]
 class QueueController extends AbstractController
 {
-    /**
-     * @var QueueService
-     */
     #[Inject]
-    protected $service;
+    protected QueueService $service;
 
     /**
      * 注解模式投递消息
@@ -338,10 +395,36 @@ class QueueController extends AbstractController
 }
 ```
 
+### 默认脚本
+
+Arguments:
+  - queue_name: 队列配置名，默认为 default
+
+Options:
+  - channel_name: 队列名，例如失败队列 failed, 超时队列 timeout
+
+#### 展示当前队列的消息状态
+
+```shell
+$ php bin/hyperf.php queue:info {queue_name}
+```
+
+#### 重载所有失败/超时的消息到待执行队列
+
+```shell
+php bin/hyperf.php queue:reload {queue_name} -Q {channel_name}
+```
+
+#### 销毁所有失败/超时的消息
+
+```shell
+php bin/hyperf.php queue:flush {queue_name} -Q {channel_name}
+```
+
 ## 事件
 
 |   事件名称   |        触发时机         |                         备注                         |
-|:------------:|:-----------------------:|:----------------------------------------------------:|
+| :----------: | :---------------------: | :--------------------------------------------------: |
 | BeforeHandle |     处理消息前触发      |                                                      |
 | AfterHandle  |     处理消息后触发      |                                                      |
 | FailedHandle |   处理消息失败后触发    |                                                      |
@@ -384,7 +467,7 @@ return [
 任务执行流转流程主要包括以下几个队列:
 
 |  队列名  |                   备注                    |
-|:--------:|:-----------------------------------------:|
+| :------: | :---------------------------------------: |
 | waiting  |              等待消费的队列               |
 | reserved |              正在消费的队列               |
 | delayed  |              延迟消费的队列               |
@@ -497,7 +580,6 @@ return [
 ];
 
 ```
-
 
 ## 异步驱动之间的区别
 

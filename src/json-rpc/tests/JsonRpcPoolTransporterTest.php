@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\JsonRpc;
 
 use Hyperf\Context\ApplicationContext;
@@ -27,13 +28,16 @@ use Hyperf\Pool\Channel;
 use Hyperf\Pool\PoolOption;
 use HyperfTest\JsonRpc\Stub\RpcPoolStub;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use stdClass;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class JsonRpcPoolTransporterTest extends TestCase
 {
     protected function tearDown(): void
@@ -166,6 +170,7 @@ class JsonRpcPoolTransporterTest extends TestCase
         ApplicationContext::setContainer($container);
 
         $container->shouldReceive('has')->with(StdoutLoggerInterface::class)->andReturnFalse();
+        $container->shouldReceive('has')->with(EventDispatcherInterface::class)->andReturnFalse();
         $container->shouldReceive('get')->with(PoolFactory::class)->andReturn(new PoolFactory($container));
         $container->shouldReceive('make')->with(RpcPool::class, Mockery::any())->andReturnUsing(function ($_, $args) use ($container) {
             return new RpcPoolStub($container, $args['name'], $args['config']);

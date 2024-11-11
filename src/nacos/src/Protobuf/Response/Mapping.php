@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Nacos\Protobuf\Response;
 
 class Mapping
@@ -19,5 +20,7 @@ class Mapping
         'ConfigChangeBatchListenResponse' => ConfigChangeBatchListenResponse::class,
         'ConfigQueryResponse' => ConfigQueryResponse::class,
         'ConfigChangeNotifyRequest' => ConfigChangeNotifyRequest::class,
+        'SubscribeServiceResponse' => SubscribeServiceResponse::class,
+        'NotifySubscriberRequest' => NotifySubscriberRequest::class,
     ];
 }

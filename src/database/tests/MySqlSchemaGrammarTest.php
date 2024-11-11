@@ -9,25 +9,30 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Database;
 
 use Hyperf\Database\Connection;
+use Hyperf\Database\Model\Register;
 use Hyperf\Database\Query\Expression;
 use Hyperf\Database\Schema\Blueprint;
 use Hyperf\Database\Schema\ForeignIdColumnDefinition;
 use Hyperf\Database\Schema\Grammars\MySqlGrammar;
 use Mockery as m;
 use PDO;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class MySqlSchemaGrammarTest extends TestCase
 {
     protected function tearDown(): void
     {
+        Register::unsetConnectionResolver();
         m::close();
     }
 
@@ -59,6 +64,92 @@ class MySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
+    }
+
+    public function testNullableMorphs()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->nullableMorphs('imageable');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `imageable_type` varchar(255) null, add `imageable_id` bigint unsigned null', $statements[0]);
+        $this->assertSame('alter table `users` add index `users_imageable_type_imageable_id_index`(`imageable_type`, `imageable_id`)', $statements[1]);
+    }
+
+    public function testNullableUuidMorphs(): void
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->nullableUuidMorphs('imageable');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `imageable_type` varchar(255) null, add `imageable_id` char(36) null', $statements[0]);
+        $this->assertSame('alter table `users` add index `users_imageable_type_imageable_id_index`(`imageable_type`, `imageable_id`)', $statements[1]);
+    }
+
+    public function testUuidMorphs(): void
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->uuidMorphs('imageable');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `imageable_type` varchar(255) not null, add `imageable_id` char(36) not null', $statements[0]);
+        $this->assertSame('alter table `users` add index `users_imageable_type_imageable_id_index`(`imageable_type`, `imageable_id`)', $statements[1]);
+    }
+
+    public function testNullableNumericMorphs(): void
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->nullableNumericMorphs('imageable');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `imageable_type` varchar(255) null, add `imageable_id` bigint unsigned null', $statements[0]);
+        $this->assertSame('alter table `users` add index `users_imageable_type_imageable_id_index`(`imageable_type`, `imageable_id`)', $statements[1]);
+    }
+
+    public function testMorphs(): void
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->morphs('imageable');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `imageable_type` varchar(255) not null, add `imageable_id` bigint unsigned not null', $statements[0]);
+        $this->assertSame('alter table `users` add index `users_imageable_type_imageable_id_index`(`imageable_type`, `imageable_id`)', $statements[1]);
+    }
+
+    public function testMultiPolygon(): void
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->multiPolygon('geo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `geo` add `geo` multipolygon not null', $statements[0]);
+    }
+
+    public function testMultiLineString(): void
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->multiLineString('geo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `geo` add `geo` multilinestring not null', $statements[0]);
+    }
+
+    public function testMultiPoint(): void
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->multiPoint('geo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `geo` add `geo` multipoint not null', $statements[0]);
+    }
+
+    public function testGeometryCollection(): void
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->geometryCollection('geo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `geo` add `geo` geometrycollection not null', $statements[0]);
     }
 
     public function testEngineCreateTable()
@@ -125,6 +216,21 @@ class MySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) character set utf8mb4 collate 'utf8mb4_unicode_ci' not null) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $blueprint->charset('utf8mb4');
+        $blueprint->collation('utf8mb4_unicode_ci');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'", $statements[0]);
     }
 
     public function testBasicCreateTableWithPrefix()
@@ -536,6 +642,16 @@ class MySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `foo` varchar(100) null default CURRENT TIMESTAMP', $statements[0]);
+    }
+
+    public function testAddTinyText()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->tinyText('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` tinytext not null', $statements[0]);
     }
 
     public function testAddingText()
@@ -1080,6 +1196,12 @@ class MySqlSchemaGrammarTest extends TestCase
         $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
 
         $this->assertSame('drop view `alpha`,`beta`,`gamma`', $statement);
+    }
+
+    public function testCompileTables(): void
+    {
+        $statement = $this->getGrammar()->compileTables('foo');
+        $this->assertSame("select table_name as `name`, (data_length + index_length) as `size`, table_comment as `comment`, engine as `engine`, table_collation as `collation` from information_schema.tables where table_schema = 'foo' and table_type in ('BASE TABLE', 'SYSTEM VERSIONED') order by table_name", $statement);
     }
 
     public function testGrammarsAreMacroable()

@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Testing;
 
 use ArrayAccess;
@@ -19,6 +20,8 @@ use Hyperf\Contract\Jsonable;
 use Hyperf\Stringable\Str;
 use Hyperf\Testing\Assert as PHPUnit;
 use JsonSerializable;
+
+use function Hyperf\Collection\data_get;
 
 class AssertableJsonString implements ArrayAccess, Countable
 {
@@ -254,7 +257,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      * @param null|array $responseData
      * @return $this
      */
-    public function assertStructure(array $structure = null, $responseData = null)
+    public function assertStructure(?array $structure = null, $responseData = null)
     {
         if (is_null($structure)) {
             return $this->assertSimilar($this->decoded);

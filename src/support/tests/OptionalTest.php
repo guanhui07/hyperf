@@ -9,10 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Support;
 
 use ArrayObject;
 use Hyperf\Support\Optional;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
@@ -23,6 +25,7 @@ use function Hyperf\Support\optional;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class OptionalTest extends TestCase
 {
     public function testGetExistItemOnObject()
@@ -158,7 +161,7 @@ class OptionalTest extends TestCase
     {
         $this->assertNull(optional(null)->something());
 
-        $this->assertEquals(10, optional(new class() {
+        $this->assertEquals(10, optional(new class {
             public function something()
             {
                 return 10;
@@ -237,10 +240,10 @@ class OptionalTest extends TestCase
 
         $this->assertNull(optional(null)->present()->something());
 
-        $this->assertSame('$10.00', optional(new class() {
+        $this->assertSame('$10.00', optional(new class {
             public function present()
             {
-                return new class() {
+                return new class {
                     public function something()
                     {
                         return '$10.00';

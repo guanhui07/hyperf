@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Snowflake;
 
 use Hyperf\Config\Config;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\ConnectionInterface;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Di\Container;
 use Hyperf\Pool\Channel;
 use Hyperf\Pool\PoolOption;
@@ -30,7 +32,9 @@ use Hyperf\Snowflake\MetaGenerator\RedisSecondMetaGenerator;
 use Hyperf\Snowflake\MetaGeneratorInterface;
 use HyperfTest\Snowflake\Stub\UserDefinedIdGenerator;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Throwable;
 
 use function Hyperf\Coroutine\go;
@@ -40,6 +44,7 @@ use function Hyperf\Coroutine\parallel;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class RedisMetaGeneratorTest extends TestCase
 {
     protected function tearDown(): void
@@ -261,6 +266,9 @@ class RedisMetaGeneratorTest extends TestCase
         $container->shouldReceive('make')->with(RedisProxy::class, Mockery::any())->andReturnUsing(function ($class, $args) use ($factory) {
             return new RedisProxy($factory, $args['pool']);
         });
+
+        $container->shouldReceive('has')->with(StdoutLoggerInterface::class)->andReturnFalse();
+        $container->shouldReceive('has')->with(EventDispatcherInterface::class)->andReturnFalse();
 
         return $container;
     }

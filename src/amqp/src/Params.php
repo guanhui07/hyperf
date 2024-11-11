@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Amqp;
 
 class Params
@@ -116,45 +117,52 @@ class Params
         return $this->closeOnDestruct;
     }
 
-    public function setCloseOnDestruct(bool $closeOnDestruct)
+    public function setCloseOnDestruct(bool $closeOnDestruct): static
     {
         $this->closeOnDestruct = $closeOnDestruct;
         return $this;
     }
 
-    public function setInsist(bool $insist)
+    public function setInsist(bool $insist): static
     {
         $this->insist = $insist;
+        return $this;
     }
 
-    public function setLoginMethod(string $loginMethod)
+    public function setLoginMethod(string $loginMethod): static
     {
         $this->loginMethod = $loginMethod;
+        return $this;
     }
 
-    public function setLocale(string $locale)
+    public function setLocale(string $locale): static
     {
         $this->locale = $locale;
+        return $this;
     }
 
-    public function setConnectionTimeout(int $connectionTimeout)
+    public function setConnectionTimeout(int $connectionTimeout): static
     {
         $this->connectionTimeout = $connectionTimeout;
+        return $this;
     }
 
-    public function setReadWriteTimeout(int $readWriteTimeout)
+    public function setReadWriteTimeout(int $readWriteTimeout): static
     {
         $this->readWriteTimeout = $readWriteTimeout;
+        return $this;
     }
 
-    public function setKeepalive(bool $keepalive)
+    public function setKeepalive(bool $keepalive): static
     {
         $this->keepalive = $keepalive;
+        return $this;
     }
 
-    public function setHeartbeat(int $heartbeat)
+    public function setHeartbeat(int $heartbeat): static
     {
         $this->heartbeat = $heartbeat;
+        return $this;
     }
 
     public function getChannelRpcTimeout(): float
@@ -162,9 +170,10 @@ class Params
         return $this->channelRpcTimeout;
     }
 
-    public function setChannelRpcTimeout(float $channelRpcTimeout)
+    public function setChannelRpcTimeout(float $channelRpcTimeout): static
     {
         $this->channelRpcTimeout = $channelRpcTimeout;
+        return $this;
     }
 
     public function getMaxIdleChannels(): int
@@ -172,8 +181,9 @@ class Params
         return $this->maxIdleChannels;
     }
 
-    public function setMaxIdleChannels(int $maxIdleChannels)
+    public function setMaxIdleChannels(int $maxIdleChannels): static
     {
         $this->maxIdleChannels = $maxIdleChannels;
+        return $this;
     }
 }

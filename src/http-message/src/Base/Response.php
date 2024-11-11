@@ -9,12 +9,16 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\HttpMessage\Base;
 
+use Hyperf\Engine\Http\Http;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
+use Stringable;
+use Swow\Psr7\Message\ResponsePlusInterface;
 
-class Response implements ResponseInterface
+class Response implements ResponseInterface, ResponsePlusInterface, Stringable
 {
     use MessageTrait;
 
@@ -122,10 +126,9 @@ class Response implements ResponseInterface
      *
      * @param string $name the attribute name
      * @param mixed $default default value to return if the attribute does not exist
-     * @return mixed
      * @see getAttributes()
      */
-    public function getAttribute($name, $default = null)
+    public function getAttribute(string $name, mixed $default = null): mixed
     {
         return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
@@ -142,11 +145,17 @@ class Response implements ResponseInterface
      * @param mixed $value the value of the attribute
      * @see getAttributes()
      */
-    public function withAttribute($name, $value): static
+    public function withAttribute(string $name, mixed $value): static
     {
         $clone = clone $this;
         $clone->attributes[$name] = $value;
         return $clone;
+    }
+
+    public function setAttribute(string $name, mixed $value): static
+    {
+        $this->attributes[$name] = $value;
+        return $this;
     }
 
     /**
@@ -312,7 +321,7 @@ class Response implements ResponseInterface
     /**
      * Is the response a redirect of some form?
      */
-    public function isRedirect(string $location = null): bool
+    public function isRedirect(?string $location = null): bool
     {
         return in_array($this->statusCode, [
             201,
@@ -330,5 +339,26 @@ class Response implements ResponseInterface
     public function isEmpty(): bool
     {
         return in_array($this->statusCode, [204, 304]);
+    }
+
+    public function toString(bool $withoutBody = false): string
+    {
+        return Http::packResponse(
+            $this->getStatusCode(),
+            $this->getReasonPhrase(),
+            $this->getStandardHeaders(),
+            $withoutBody ? '' : (string) $this->getBody(),
+            $this->getProtocolVersion()
+        );
+    }
+
+    public function setStatus(int $code, string $reasonPhrase = ''): static
+    {
+        $this->statusCode = $code;
+        if (! $reasonPhrase && isset(self::$phrases[$code])) {
+            $reasonPhrase = self::$phrases[$code];
+        }
+        $this->reasonPhrase = $reasonPhrase;
+        return $this;
     }
 }

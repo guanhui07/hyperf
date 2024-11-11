@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Translation;
 
 use Hyperf\Config\Config;
@@ -19,9 +20,15 @@ use Hyperf\Support\Filesystem\Filesystem;
 use Hyperf\Translation\FileLoader;
 use Hyperf\Translation\FileLoaderFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
+/**
+ * @internal
+ * @coversNothing
+ */
+#[CoversNothing]
 /**
  * @internal
  * @coversNothing
@@ -44,7 +51,6 @@ class FileLoaderTest extends TestCase
         $loader = $factory($container);
         $ref = new ReflectionClass($loader);
         $path = $ref->getProperty('path');
-        $path->setAccessible(true);
         $this->assertSame(BASE_PATH . '/storage/languages', $path->getValue($loader));
     }
 

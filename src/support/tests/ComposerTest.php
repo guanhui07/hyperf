@@ -9,16 +9,19 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Support;
 
 use Composer\Autoload\ClassLoader;
 use Hyperf\Support\Composer;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ComposerTest extends TestCase
 {
     public function testFindLoader()
@@ -26,5 +29,11 @@ class ComposerTest extends TestCase
         $loader = Composer::getLoader();
 
         $this->assertInstanceOf(ClassLoader::class, $loader);
+    }
+
+    public function testHasPackage()
+    {
+        $this->assertTrue(Composer::hasPackage('hyperf/framework'));
+        $this->assertFalse(Composer::hasPackage('composer/unknown'));
     }
 }

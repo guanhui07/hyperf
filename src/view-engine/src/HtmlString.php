@@ -9,12 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\ViewEngine;
 
 use Hyperf\ViewEngine\Contract\Htmlable;
-use Stringable;
 
-class HtmlString implements Htmlable, Stringable
+class HtmlString implements Htmlable
 {
     /**
      * Create a new HTML string instance.

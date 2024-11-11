@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Di;
 
 use Hyperf\Di\Annotation\AnnotationReader;
 use HyperfTest\Di\Stub\FooWithNotExistAnnotation;
 use HyperfTest\Di\Stub\IgnoreDemoAnnotation;
 use HyperfTest\Di\Stub\NotFoundAttributeTarget;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Throwable;
@@ -23,6 +25,7 @@ use Throwable;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class AnnotationReaderTest extends TestCase
 {
     public function testGetNotFoundAttributesOfClass()

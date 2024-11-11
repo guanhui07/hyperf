@@ -9,15 +9,17 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Amqp\Message;
 
 use Hyperf\Amqp\Builder\QueueBuilder;
+use Hyperf\Amqp\Result;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Container\ContainerInterface;
 
 interface ConsumerMessageInterface extends MessageInterface
 {
-    public function consumeMessage($data, AMQPMessage $message): string;
+    public function consumeMessage($data, AMQPMessage $message): Result;
 
     public function setQueue(string $queue): static;
 
@@ -39,9 +41,9 @@ interface ConsumerMessageInterface extends MessageInterface
 
     public function setMaxConsumption(int $maxConsumption): static;
 
-    public function getWaitTimeout(): int|float;
+    public function getWaitTimeout(): float|int;
 
-    public function setWaitTimeout(int|float $timeout): static;
+    public function setWaitTimeout(float|int $timeout): static;
 
     public function setNums(int $nums): static;
 

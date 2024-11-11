@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Retry;
 
 use Hyperf\Context\ApplicationContext;
@@ -18,6 +19,7 @@ use Hyperf\Retry\Retry;
 use HyperfTest\Retry\Stub\Foo;
 use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
@@ -26,6 +28,7 @@ use RuntimeException;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class RetryTest extends TestCase
 {
     protected function tearDown(): void

@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\ModelCache\Handler;
 
 use DateInterval;
@@ -20,12 +21,14 @@ use Hyperf\ModelCache\Handler\RedisHandler;
 use Hyperf\Redis\RedisProxy;
 use HyperfTest\ModelCache\Stub\ContainerStub;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class RedisHandlerTest extends TestCase
 {
     protected $handler = RedisHandler::class;

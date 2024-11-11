@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Paginator;
 
 use ArrayAccess;
@@ -19,10 +20,11 @@ use Hyperf\Collection\Collection;
 use Hyperf\Contract\PaginatorInterface;
 use Hyperf\Stringable\Str;
 use Hyperf\Support\Traits\ForwardsCalls;
+use Stringable;
 
 use function Hyperf\Collection\collect;
 
-abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
+abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess, Stringable
 {
     use ForwardsCalls;
 
@@ -80,6 +82,11 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
      * The current page resolver callback.
      */
     protected static ?Closure $currentPageResolver = null;
+
+    /**
+     * The query string resolver callback.
+     */
+    protected static ?Closure $queryStringResolver = null;
 
     /**
      * Make dynamic calls into the collection.
@@ -160,7 +167,7 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
      *
      * @param null|array|string $key
      */
-    public function appends($key, ?string $value = null): self
+    public function appends($key, null|array|string $value = null): static
     {
         if (is_null($key)) {
             return $this;
@@ -176,7 +183,7 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
     /**
      * Load a set of relationships onto the mixed relationship collection.
      */
-    public function loadMorph(string $relation, array $relations): self
+    public function loadMorph(string $relation, array $relations): static
     {
         $collection = $this->getCollection();
         if (method_exists($collection, 'loadMorph')) {
@@ -253,7 +260,7 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
     /**
      * Set the query string variable used to store the page.
      */
-    public function setPageName(string $name): self
+    public function setPageName(string $name): static
     {
         $this->pageName = $name;
 
@@ -263,7 +270,7 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
     /**
      * Set the base path to assign to all URLs.
      */
-    public function withPath(string $path): self
+    public function withPath(string $path): static
     {
         return $this->setPath($path);
     }
@@ -271,7 +278,7 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
     /**
      * Set the base path to assign to all URLs.
      */
-    public function setPath(string $path): self
+    public function setPath(string $path): static
     {
         $this->path = $path;
 
@@ -281,7 +288,7 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
     /**
      * Set the number of links to display on each side of current page link.
      */
-    public function onEachSide(int $count): self
+    public function onEachSide(int $count): static
     {
         $this->onEachSide = $count;
 
@@ -371,7 +378,7 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
     /**
      * Set the paginator's underlying collection.
      */
-    public function setCollection(Collection $collection): self
+    public function setCollection(Collection $collection): static
     {
         $this->items = $collection;
 
@@ -410,6 +417,38 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
     }
 
     /**
+     * Add all current query string values to the paginator.
+     */
+    public function withQueryString(): static
+    {
+        if (isset(static::$queryStringResolver)) {
+            return $this->appends(call_user_func(static::$queryStringResolver));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Resolve the query string or return the default value.
+     */
+    public static function resolveQueryString(null|array|string $default = null): string
+    {
+        if (isset(static::$queryStringResolver)) {
+            return (static::$queryStringResolver)();
+        }
+
+        return $default;
+    }
+
+    /**
+     * Set with query string resolver callback.
+     */
+    public static function queryStringResolver(Closure $resolver): void
+    {
+        static::$queryStringResolver = $resolver;
+    }
+
+    /**
      * Determine if the given value is a valid page number.
      */
     protected function isValidPageNumber(int $page): bool
@@ -420,7 +459,7 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
     /**
      * Add an array of query string values.
      */
-    protected function appendArray(array $keys): self
+    protected function appendArray(array $keys): static
     {
         foreach ($keys as $key => $value) {
             $this->addQuery($key, $value);
@@ -432,7 +471,7 @@ abstract class AbstractPaginator implements PaginatorInterface, ArrayAccess
     /**
      * Add a query string value to the paginator.
      */
-    protected function addQuery(string $key, string $value): self
+    protected function addQuery(string $key, array|string $value): static
     {
         if ($key !== $this->pageName) {
             $this->query[$key] = $value;

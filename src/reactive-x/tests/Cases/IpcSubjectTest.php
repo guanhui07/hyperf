@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Cases;
 
 use Hyperf\Context\ApplicationContext;
@@ -23,6 +24,7 @@ use Hyperf\ReactiveX\IpcMessageWrapper;
 use Hyperf\ReactiveX\IpcSubject;
 use Hyperf\ReactiveX\RxSwoole;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Rx\Notification\OnNextNotification;
@@ -38,6 +40,7 @@ use function Hyperf\Support\swoole_hook_flags;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class IpcSubjectTest extends TestCase
 {
     public static function setUpBeforeClass(): void

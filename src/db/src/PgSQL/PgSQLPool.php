@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\DB\PgSQL;
 
 use Hyperf\Contract\ConnectionInterface;
@@ -18,9 +19,6 @@ class PgSQLPool extends Pool
 {
     protected function createConnection(): ConnectionInterface
     {
-        if (SWOOLE_MAJOR_VERSION < 5) {
-            return new Swoole4PgSQLConnection($this->container, $this, $this->config);
-        }
         return new PgSQLConnection($this->container, $this, $this->config);
     }
 }

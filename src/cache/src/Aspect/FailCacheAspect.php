@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Cache\Aspect;
 
 use Hyperf\Cache\Annotation\FailCache;
@@ -37,13 +38,17 @@ class FailCacheAspect extends AbstractAspect
         $method = $proceedingJoinPoint->methodName;
         $arguments = $proceedingJoinPoint->arguments['keys'];
 
-        [$key, $ttl, $group] = $this->annotationManager->getFailCacheValue($className, $method, $arguments);
+        /** @var FailCache $annotation */
+        [$key, $ttl, $group, $annotation] = $this->annotationManager->getFailCacheValue($className, $method, $arguments);
 
         $driver = $this->manager->getDriver($group);
 
         try {
             $result = $proceedingJoinPoint->process();
-            $driver->set($key, $result, $ttl);
+
+            if (! in_array($result, (array) $annotation->skipCacheResults, true)) {
+                $driver->set($key, $result, $ttl);
+            }
         } catch (Throwable $throwable) {
             [$has, $result] = $driver->fetch($key);
             if (! $has) {

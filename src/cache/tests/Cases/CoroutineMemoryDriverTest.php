@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Cache\Cases;
 
 use Hyperf\Cache\Collector\CoroutineMemory;
 use Hyperf\Cache\Driver\CoroutineMemoryDriver;
 use Hyperf\Codec\Packer\PhpSerializerPacker;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -24,6 +26,7 @@ use function Hyperf\Coroutine\parallel;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class CoroutineMemoryDriverTest extends TestCase
 {
     protected function tearDown(): void

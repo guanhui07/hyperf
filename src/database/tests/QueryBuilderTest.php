@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Database;
 
 use BadMethodCallException;
@@ -28,7 +29,10 @@ use Hyperf\Paginator\LengthAwarePaginator;
 use Hyperf\Paginator\Paginator;
 use InvalidArgumentException;
 use Mockery;
+use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use RuntimeException;
 
 use function Hyperf\Collection\collect;
@@ -37,6 +41,7 @@ use function Hyperf\Collection\collect;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class QueryBuilderTest extends TestCase
 {
     protected function tearDown(): void
@@ -850,6 +855,35 @@ class QueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->orderByDesc('name');
         $this->assertEquals('select * from "users" order by "name" desc', $builder->toSql());
+    }
+
+    public function testReorder()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy('name');
+        $this->assertSame('select * from "users" order by "name" asc', $builder->toSql());
+        $builder->reorder();
+        $this->assertSame('select * from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy('name');
+        $this->assertSame('select * from "users" order by "name" asc', $builder->toSql());
+        $builder->reorder('email', 'desc');
+        $this->assertSame('select * from "users" order by "email" desc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('first');
+        $builder->union($this->getBuilder()->select('*')->from('second'));
+        $builder->orderBy('name');
+        $this->assertSame('select * from "first" union select * from "second" order by "name" asc', $builder->toSql());
+        $builder->reorder();
+        $this->assertSame('select * from "first" union select * from "second"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByRaw('?', [true]);
+        $this->assertEquals([true], $builder->getBindings());
+        $builder->reorder();
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testHavings()
@@ -3001,6 +3035,60 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
+    public function testBitWheres()
+    {
+        $type = 16;
+        $flags = 32;
+        $builder = $this->getBuilder();
+        $clone = $builder->clone();
+
+        $builder->select('*')->from('users')->whereBit('type', $type);
+        $this->assertEquals('select * from "users" where type & ? = ?', $builder->toSql());
+        $builder->select('*')->from('users')->orWhereBit('flags', $flags);
+        $this->assertEquals('select * from "users" where type & ? = ? or flags & ? = ?', $builder->toSql());
+
+        $clone->select('*')->from('users')->whereBitNot('type', $type);
+        $this->assertEquals('select * from "users" where type & ? != ?', $clone->toSql());
+        $clone->select('*')->from('users')->orWhereBitNot('flags', $flags);
+        $this->assertEquals('select * from "users" where type & ? != ? or flags & ? != ?', $clone->toSql());
+    }
+
+    public function testBitWheresOr()
+    {
+        $type = 16;
+        $flags = 32;
+        $builder = $this->getBuilder();
+        $clone = $builder->clone();
+
+        $builder->select('*')->from('users')->whereBitOr('type', $type);
+        $this->assertEquals('select * from "users" where type | ? = ?', $builder->toSql());
+        $builder->select('*')->from('users')->orWhereBitOr('flags', $flags);
+        $this->assertEquals('select * from "users" where type | ? = ? or flags | ? = ?', $builder->toSql());
+
+        $clone->select('*')->from('users')->whereBitOrNot('type', $type);
+        $this->assertEquals('select * from "users" where type | ? != ?', $clone->toSql());
+        $clone->select('*')->from('users')->orWhereBitOrNot('flags', $flags);
+        $this->assertEquals('select * from "users" where type | ? != ? or flags | ? != ?', $clone->toSql());
+    }
+
+    public function testBitWheresXor()
+    {
+        $type = 16;
+        $flags = 32;
+        $builder = $this->getBuilder();
+        $clone = $builder->clone();
+
+        $builder->select('*')->from('users')->whereBitXor('type', $type);
+        $this->assertEquals('select * from "users" where type ^ ? = ?', $builder->toSql());
+        $builder->select('*')->from('users')->orWhereBitXor('flags', $flags);
+        $this->assertEquals('select * from "users" where type ^ ? = ? or flags ^ ? = ?', $builder->toSql());
+
+        $clone->select('*')->from('users')->whereBitXorNot('type', $type);
+        $this->assertEquals('select * from "users" where type ^ ? != ?', $clone->toSql());
+        $clone->select('*')->from('users')->orWhereBitXorNot('flags', $flags);
+        $this->assertEquals('select * from "users" where type ^ ? != ? or flags ^ ? != ?', $clone->toSql());
+    }
+
     public function testClone()
     {
         $builder = $this->getBuilder();
@@ -3008,6 +3096,33 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($builder->toSql(), $clone->toSql());
         $this->assertEquals($builder->getBindings(), $clone->getBindings());
         $this->assertNotSame($builder, $clone);
+    }
+
+    public function testToRawSql()
+    {
+        $connection = Mockery::mock(ConnectionInterface::class);
+        $connection->shouldReceive('prepareBindings')
+            ->with(['foo'])
+            ->andReturn(['foo']);
+        $connection->shouldReceive('escape')->with('foo')->andReturn('\'foo\'');
+        $grammar = Mockery::mock(Grammar::class)->makePartial();
+        $builder = new Builder($connection, $grammar, Mockery::mock(Processor::class));
+        $builder->select('*')->from('users')->where('email', 'foo');
+
+        $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
+    }
+
+    public function testQueryBuilderInvalidOperator()
+    {
+        $class = new ReflectionClass(Builder::class);
+        $method = $class->getMethod('invalidOperator');
+        $call = $method->getClosure($this->getMySqlBuilderWithProcessor());
+
+        $this->assertTrue(call_user_func($call, 1));
+        $this->assertTrue(call_user_func($call, '1'));
+        $this->assertFalse(call_user_func($call, '<>'));
+        $this->assertFalse(call_user_func($call, '='));
+        $this->assertTrue(call_user_func($call, '!'));
     }
 
     protected function getBuilderWithProcessor(): Builder
@@ -3024,7 +3139,7 @@ class QueryBuilderTest extends TestCase
     }
 
     /**
-     * @return Builder|\Mockery\MockInterface
+     * @return Builder|MockInterface
      */
     protected function getMockQueryBuilder()
     {

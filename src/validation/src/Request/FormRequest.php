@@ -9,10 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Validation\Request;
 
 use Hyperf\Collection\Arr;
 use Hyperf\Context\Context;
+use Hyperf\Context\ResponseContext;
 use Hyperf\Contract\ValidatorInterface;
 use Hyperf\HttpServer\Request;
 use Hyperf\Validation\Contract\ValidatesWhenResolved;
@@ -64,10 +66,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function response(): ResponseInterface
     {
-        /** @var ResponseInterface $response */
-        $response = Context::get(ResponseInterface::class);
-
-        return $response->withStatus(422);
+        return ResponseContext::get()->withStatus(422);
     }
 
     /**
@@ -102,6 +101,11 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $this->container = $container;
 
         return $this;
+    }
+
+    public function rules(): array
+    {
+        return [];
     }
 
     /**
@@ -198,7 +202,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function getRules(): array
     {
-        $rules = call_user_func_array([$this, 'rules'], []);
+        $rules = $this->rules();
         $scene = $this->getScene();
         if ($scene && isset($this->scenes[$scene]) && is_array($this->scenes[$scene])) {
             return Arr::only($rules, $this->scenes[$scene]);

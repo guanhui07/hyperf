@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Pipeline;
 
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Pipeline\Pipeline;
 use HyperfTest\Pipeline\Stub\FooPipeline;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -22,6 +24,7 @@ use Psr\Container\ContainerInterface;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class PipelineTest extends TestCase
 {
     protected function tearDown(): void

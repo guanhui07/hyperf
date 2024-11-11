@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Validation\Middleware;
 
 use Closure;
@@ -137,6 +138,9 @@ class ValidationMiddleware implements MiddlewareInterface
                 return explode('@', $handler);
             }
             $array = explode('::', $handler);
+            if (! isset($array[1]) && class_exists($handler) && method_exists($handler, '__invoke')) {
+                $array[1] = '__invoke';
+            }
             return [$array[0], $array[1] ?? null];
         }
         if (is_array($handler) && isset($handler[0], $handler[1])) {

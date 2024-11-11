@@ -9,10 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\WebSocketServer;
 
 use Hyperf\Context\Context as CoContext;
 use Hyperf\WebSocketServer\Context;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 use function Hyperf\Coroutine\parallel;
@@ -21,6 +23,7 @@ use function Hyperf\Coroutine\parallel;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ContextTest extends TestCase
 {
     public function testHas()
@@ -35,7 +38,7 @@ class ContextTest extends TestCase
         $this->assertEquals(42, Context::get('a'));
     }
 
-    public function testDestory()
+    public function testDestroy()
     {
         Context::set('a', 42);
         Context::destroy('a');

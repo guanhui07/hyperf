@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Coroutine;
 
 use Hyperf\Context\ApplicationContext;
@@ -17,6 +18,7 @@ use Hyperf\Coroutine\Exception\WaitTimeoutException;
 use Hyperf\Coroutine\Waiter;
 use Hyperf\Engine\Channel;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
@@ -27,6 +29,7 @@ use function Hyperf\Coroutine\wait;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class WaiterTest extends TestCase
 {
     protected function setUp(): void

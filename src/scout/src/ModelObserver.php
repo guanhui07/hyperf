@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Scout;
 
 use Hyperf\Context\Context;
@@ -19,6 +20,7 @@ use Hyperf\Database\Model\Events\Saved;
 use Hyperf\Database\Model\Model;
 use Hyperf\Database\Model\SoftDeletes;
 
+use function Hyperf\Config\config;
 use function Hyperf\Support\class_uses_recursive;
 
 class ModelObserver

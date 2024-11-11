@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\JsonRpc;
 
 use Hyperf\JsonRpc\DataFormatter;
@@ -19,6 +20,7 @@ use Hyperf\RpcClient\Exception\RequestException;
 use Hyperf\Serializer\SerializerFactory;
 use Hyperf\Serializer\SymfonyNormalizer;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -26,6 +28,7 @@ use RuntimeException;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class DataFormatterTest extends TestCase
 {
     protected function tearDown(): void

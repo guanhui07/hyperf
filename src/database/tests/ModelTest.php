@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Database;
 
 use Carbon\Carbon;
@@ -29,6 +30,8 @@ use Hyperf\Database\Model\Booted;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Events;
+use Hyperf\Database\Model\JsonEncodingException;
+use Hyperf\Database\Model\MassAssignmentException;
 use Hyperf\Database\Model\Model;
 use Hyperf\Database\Model\Register;
 use Hyperf\Database\Model\Relations\BelongsTo;
@@ -67,6 +70,7 @@ use HyperfTest\Database\Stubs\NoConnectionModelStub;
 use HyperfTest\Database\Stubs\User;
 use LogicException;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface as Dispatcher;
@@ -80,21 +84,18 @@ use function Hyperf\Coroutine\go;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ModelTest extends TestCase
 {
     use InteractsWithTime;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         Carbon::setTestNow(Carbon::now());
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Mockery::close();
         Carbon::setTestNow(null);
 
@@ -859,7 +860,6 @@ class ModelTest extends TestCase
 
         $class = new ReflectionClass($model);
         $method = $class->getMethod('getArrayableRelations');
-        $method->setAccessible(true);
 
         $model->setRelation('foo', ['bar']);
         $model->setRelation('bam', ['boom']);
@@ -959,6 +959,65 @@ class ModelTest extends TestCase
         $this->assertArrayHasKey('id', $array);
     }
 
+    public function testMakeVisibleIf()
+    {
+        $model = new ModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(true, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(false, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+
+        $model->setHidden(['age', 'id']);
+        $model->makeVisibleIf(function ($model) {
+            return ! is_null($model->name);
+        }, 'age');
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+    }
+
+    public function testMakeHiddenIf()
+    {
+        $model = new ModelStub(['name' => 'foo', 'age' => 'bar', 'address' => 'foobar', 'id' => 'baz']);
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHiddenIf(true, 'address')->toArray();
+        $this->assertArrayNotHasKey('address', $array);
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $model->makeVisible('address');
+
+        $array = $model->makeHiddenIf(false, ['name', 'age'])->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('age', $array);
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayHasKey('id', $array);
+
+        $array = $model->makeHiddenIf(function ($model) {
+            return ! is_null($model->id);
+        }, ['name', 'age'])->toArray();
+        $this->assertArrayHasKey('address', $array);
+        $this->assertArrayNotHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayHasKey('id', $array);
+    }
+
     public function testDynamicVisible()
     {
         $model = new ModelDynamicVisibleStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
@@ -1049,7 +1108,7 @@ class ModelTest extends TestCase
 
     public function testGlobalGuarded()
     {
-        $this->expectException(\Hyperf\Database\Model\MassAssignmentException::class);
+        $this->expectException(MassAssignmentException::class);
         $this->expectExceptionMessage('name');
 
         $model = new ModelStub();
@@ -1728,7 +1787,7 @@ class ModelTest extends TestCase
 
     public function testGetOriginalIncrementWithExtra()
     {
-        $model = new class() extends ModelCastingStub {
+        $model = new class extends ModelCastingStub {
             public function newBaseQueryBuilder()
             {
                 $connection = Mockery::mock(Connection::class);
@@ -1755,7 +1814,7 @@ class ModelTest extends TestCase
 
     public function testModelAttributeCastingFailsOnUnencodableData()
     {
-        $this->expectException(\Hyperf\Database\Model\JsonEncodingException::class);
+        $this->expectException(JsonEncodingException::class);
         $this->expectExceptionMessage('Unable to encode attribute [objectAttribute] for model [HyperfTest\Database\Stubs\ModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.');
 
         $model = new ModelCastingStub();
@@ -2010,6 +2069,18 @@ class ModelTest extends TestCase
         $model = new ModelStubWithUuid();
 
         $this->assertTrue(Str::isUuid($model->newUniqueId()));
+    }
+
+    public function testGetMorphAlias()
+    {
+        Relation::morphMap(['user' => ModelStub::class]);
+
+        try {
+            $this->assertSame('user', Relation::getMorphAlias(ModelStub::class));
+            $this->assertSame('Does\Not\Exist', Relation::getMorphAlias('Does\Not\Exist'));
+        } finally {
+            Relation::morphMap([], false);
+        }
     }
 
     protected function getContainer()

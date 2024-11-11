@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\ServiceGovernanceNacos;
 
 use Hyperf\Codec\Json;
@@ -47,6 +48,11 @@ class NacosDriver implements DriverInterface
         $this->client = $container->get(Client::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->config = $container->get(ConfigInterface::class);
+    }
+
+    public function isLongPolling(): bool
+    {
+        return false;
     }
 
     public function getNodes(string $uri, string $name, array $metadata): array

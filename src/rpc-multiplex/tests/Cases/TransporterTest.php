@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\RpcMultiplex\Cases;
 
 use Hyperf\LoadBalancer\LoadBalancerInterface;
@@ -16,11 +17,13 @@ use Hyperf\RpcMultiplex\Transporter;
 use Hyperf\Support\Reflection\ClassInvoker;
 use HyperfTest\RpcMultiplex\Stub\ContainerStub;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class TransporterTest extends AbstractTestCase
 {
     public function testGetLoadBalancer()

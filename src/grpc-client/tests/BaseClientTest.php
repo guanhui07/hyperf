@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\GrpcClient;
 
 use Grpc\UserReply;
@@ -22,6 +23,7 @@ use Hyperf\GrpcClient\BaseClient;
 use Hyperf\GrpcClient\Exception\GrpcClientException;
 use HyperfTest\GrpcClient\Stub\HiClient;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Swoole\Coroutine\Http\Server;
 use TypeError;
@@ -30,6 +32,7 @@ use TypeError;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class BaseClientTest extends TestCase
 {
     public static $server;

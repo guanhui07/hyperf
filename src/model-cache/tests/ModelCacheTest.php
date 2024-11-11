@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\ModelCache;
 
 use DateInterval;
@@ -29,6 +30,7 @@ use HyperfTest\ModelCache\Stub\UserExtModel;
 use HyperfTest\ModelCache\Stub\UserHiddenModel;
 use HyperfTest\ModelCache\Stub\UserModel;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Redis;
 use stdClass;
@@ -40,6 +42,7 @@ use function Hyperf\Coroutine\wait;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ModelCacheTest extends TestCase
 {
     /**

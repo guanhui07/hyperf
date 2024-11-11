@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\JsonRpc;
 
 use Hyperf\Codec\Packer\JsonPacker;
@@ -38,6 +39,7 @@ use HyperfTest\JsonRpc\Stub\IntegerValue;
 use Mockery;
 use Mockery\MockInterface;
 use Monolog\Handler\StreamHandler;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Serializer;
 
@@ -45,6 +47,7 @@ use Symfony\Component\Serializer\Serializer;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class RpcServiceClientTest extends TestCase
 {
     protected function setUp(): void

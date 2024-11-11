@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Watcher;
 
 use Hyperf\Codec\Json;
@@ -19,9 +20,12 @@ use Hyperf\Support\Exception\InvalidArgumentException;
 use Hyperf\Support\Filesystem\FileNotFoundException;
 use Hyperf\Support\Filesystem\Filesystem;
 use Hyperf\Watcher\Driver\DriverInterface;
+use Hyperf\Watcher\Event\BeforeServerRestart;
 use PhpParser\PrettyPrinter\Standard;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 use function Hyperf\Support\make;
 
@@ -55,7 +59,7 @@ class Watcher
 
     public function run()
     {
-        $this->dumpautoload();
+        $this->dumpAutoload();
         $this->restart(true);
 
         $channel = new Channel(999);
@@ -84,7 +88,7 @@ class Watcher
         }
     }
 
-    public function dumpautoload()
+    public function dumpAutoload()
     {
         $ret = exec('composer dump-autoload -o --no-scripts -d ' . BASE_PATH);
         $this->output->writeln($ret['output'] ?? '');
@@ -107,10 +111,12 @@ class Watcher
             $pid = $this->filesystem->get($file);
             try {
                 $this->output->writeln('Stop server...');
+                $this->container->get(EventDispatcherInterface::class)
+                    ->dispatch(new BeforeServerRestart($pid));
                 if (posix_kill((int) $pid, 0)) {
                     posix_kill((int) $pid, SIGTERM);
                 }
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 $this->output->writeln('Stop server failed. Please execute `composer dump-autoload -o`');
             }
         }
@@ -119,13 +125,17 @@ class Watcher
             $this->channel->pop();
             $this->output->writeln('Start server ...');
 
-            $descriptorspec = [
+            $descriptorSpec = [
                 0 => STDIN,
                 1 => STDOUT,
                 2 => STDERR,
             ];
 
-            proc_open($this->option->getBin() . ' ' . BASE_PATH . '/' . $this->option->getCommand(), $descriptorspec, $pipes);
+            proc_open(
+                command: $this->option->getBin() . ' ' . BASE_PATH . '/' . $this->option->getCommand(),
+                descriptor_spec: $descriptorSpec,
+                pipes: $pipes
+            );
 
             $this->output->writeln('Stop server success.');
             $this->channel->push(1);

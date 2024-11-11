@@ -9,15 +9,15 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Collection;
 
 use ArrayAccess;
-use ArrayIterator;
-use IteratorAggregate;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
-use Traversable;
 
 use function Hyperf\Collection\data_fill;
+use function Hyperf\Collection\data_forget;
 use function Hyperf\Collection\data_get;
 use function Hyperf\Collection\data_set;
 use function Hyperf\Collection\head;
@@ -28,9 +28,10 @@ use function Hyperf\Collection\value;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class FunctionsTest extends TestCase
 {
-    public function testDataGet()
+    public function testDataGet(): void
     {
         $object = (object) ['users' => ['name' => ['Taylor', 'Otwell']]];
         $array = [(object) ['users' => [(object) ['name' => 'Taylor']]]];
@@ -56,7 +57,7 @@ class FunctionsTest extends TestCase
         $this->assertNull(data_get($arrayAccess, 'email', 'Not found'));
     }
 
-    public function testDataGetWithNestedArrays()
+    public function testDataGetWithNestedArrays(): void
     {
         $array = [
             ['name' => 'taylor', 'email' => 'taylorotwell@gmail.com'],
@@ -66,14 +67,6 @@ class FunctionsTest extends TestCase
 
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
-
-        // $arrayIterable = new SupportTestArrayIterable([
-        //     ['name' => 'taylor', 'email' => 'taylorotwell@gmail.com'],
-        //     ['name' => 'abigail'],
-        //     ['name' => 'dayle'],
-        // ]);
-        // $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($arrayIterable, '*.name'));
-        // $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($arrayIterable, '*.email', 'irrelevant'));
 
         $array = [
             'users' => [
@@ -90,7 +83,7 @@ class FunctionsTest extends TestCase
         $this->assertNull(data_get($array, 'posts.*.date'));
     }
 
-    public function testDataGetWithDoubleNestedArraysCollapsesResult()
+    public function testDataGetWithDoubleNestedArraysCollapsesResult(): void
     {
         $array = [
             'posts' => [
@@ -121,7 +114,7 @@ class FunctionsTest extends TestCase
         $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
     }
 
-    public function testDataFill()
+    public function testDataFill(): void
     {
         $data = ['foo' => 'bar'];
 
@@ -134,7 +127,7 @@ class FunctionsTest extends TestCase
         );
     }
 
-    public function testDataFillWithStar()
+    public function testDataFillWithStar(): void
     {
         $data = ['foo' => 'bar'];
 
@@ -159,7 +152,7 @@ class FunctionsTest extends TestCase
         );
     }
 
-    public function testDataFillWithDoubleStar()
+    public function testDataFillWithDoubleStar(): void
     {
         $data = [
             'posts' => [
@@ -198,7 +191,7 @@ class FunctionsTest extends TestCase
         ], $data);
     }
 
-    public function testDataSet()
+    public function testDataSet(): void
     {
         $data = ['foo' => 'bar'];
 
@@ -233,7 +226,7 @@ class FunctionsTest extends TestCase
         );
     }
 
-    public function testDataSetWithStar()
+    public function testDataSetWithStar(): void
     {
         $data = ['foo' => 'bar'];
 
@@ -258,7 +251,7 @@ class FunctionsTest extends TestCase
         );
     }
 
-    public function testDataSetWithDoubleStar()
+    public function testDataSetWithDoubleStar(): void
     {
         $data = [
             'posts' => [
@@ -297,21 +290,110 @@ class FunctionsTest extends TestCase
         ], $data);
     }
 
-    public function testHead()
+    public function testDataForget(): void
+    {
+        $data = ['foo' => 'bar', 'hello' => 'world'];
+
+        $this->assertEquals(
+            ['hello' => 'world'],
+            data_forget($data, 'foo')
+        );
+
+        $data = ['foo' => 'bar', 'hello' => 'world'];
+
+        $this->assertEquals(
+            ['foo' => 'bar', 'hello' => 'world'],
+            data_forget($data, 'nothing')
+        );
+
+        $data = ['one' => ['two' => ['three' => 'hello', 'four' => ['five']]]];
+
+        $this->assertEquals(
+            ['one' => ['two' => ['four' => ['five']]]],
+            data_forget($data, 'one.two.three')
+        );
+    }
+
+    public function testDataForgetWithStar(): void
+    {
+        $data = [
+            'article' => [
+                'title' => 'Foo',
+                'comments' => [
+                    ['comment' => 'foo', 'name' => 'First'],
+                    ['comment' => 'bar', 'name' => 'Second'],
+                ],
+            ],
+        ];
+
+        $this->assertEquals(
+            [
+                'article' => [
+                    'title' => 'Foo',
+                    'comments' => [
+                        ['comment' => 'foo'],
+                        ['comment' => 'bar'],
+                    ],
+                ],
+            ],
+            data_forget($data, 'article.comments.*.name')
+        );
+    }
+
+    public function testDataForgetWithDoubleStar(): void
+    {
+        $data = [
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'First', 'comment' => 'foo'],
+                        (object) ['name' => 'Second', 'comment' => 'bar'],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) ['name' => 'Third', 'comment' => 'hello'],
+                        (object) ['name' => 'Fourth', 'comment' => 'world'],
+                    ],
+                ],
+            ],
+        ];
+
+        data_forget($data, 'posts.*.comments.*.name');
+
+        $this->assertEquals([
+            'posts' => [
+                (object) [
+                    'comments' => [
+                        (object) ['comment' => 'foo'],
+                        (object) ['comment' => 'bar'],
+                    ],
+                ],
+                (object) [
+                    'comments' => [
+                        (object) ['comment' => 'hello'],
+                        (object) ['comment' => 'world'],
+                    ],
+                ],
+            ],
+        ], $data);
+    }
+
+    public function testHead(): void
     {
         $array = ['a', 'b', 'c'];
         $this->assertSame('a', head($array));
     }
 
-    public function testLast()
+    public function testLast(): void
     {
         $array = ['a', 'b', 'c'];
         $this->assertSame('c', last($array));
     }
 
-    public function testValue()
+    public function testValue(): void
     {
-        $callable = new class() {
+        $callable = new class {
             public function __call($method, $arguments)
             {
                 return $arguments;
@@ -329,24 +411,9 @@ class FunctionsTest extends TestCase
     }
 }
 
-class SupportTestArrayIterable implements IteratorAggregate
-{
-    protected $items = [];
-
-    public function __construct($items = [])
-    {
-        $this->items = $items;
-    }
-
-    public function getIterator(): Traversable
-    {
-        return new ArrayIterator($this->items);
-    }
-}
-
 class SupportTestArrayAccess implements ArrayAccess
 {
-    protected $attributes = [];
+    protected array $attributes = [];
 
     public function __construct($attributes = [])
     {

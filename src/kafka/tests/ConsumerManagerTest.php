@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Kafka;
 
 use Hyperf\Collection\Arr;
@@ -26,12 +27,14 @@ use longlang\phpkafka\Consumer\ConsumeMessage;
 use longlang\phpkafka\Consumer\ConsumerConfig;
 use longlang\phpkafka\Socket\SwooleSocket;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use stdClass;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ConsumerManagerTest extends TestCase
 {
     protected function tearDown(): void
@@ -124,7 +127,7 @@ class ConsumerManagerTest extends TestCase
 
     public function testConsumeReturnNull()
     {
-        $class = new class() extends AbstractConsumer {
+        $class = new class extends AbstractConsumer {
             public function consume(ConsumeMessage $message)
             {
             }

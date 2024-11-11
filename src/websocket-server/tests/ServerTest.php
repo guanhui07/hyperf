@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\WebSocketServer;
 
 use Hyperf\Context\ApplicationContext;
@@ -23,6 +24,7 @@ use Hyperf\WebSocketServer\Server;
 use HyperfTest\WebSocketServer\Stub\FooServer;
 use HyperfTest\WebSocketServer\Stub\WebSocketStub;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Swoole\Http\Request as SwooleRequest;
@@ -32,6 +34,7 @@ use Swoole\Http\Response as SwooleResponse;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ServerTest extends TestCase
 {
     protected function tearDown(): void

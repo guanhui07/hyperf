@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Testing\Http;
 
 use Hyperf\Collection\Arr;
@@ -172,14 +173,6 @@ class Client extends Server
         return $request->withQueryParams($query)
             ->withParsedBody($data)
             ->withUploadedFiles($this->normalizeFiles($multipart));
-    }
-
-    /**
-     * @deprecated It will be removed in v3.0
-     */
-    protected function init(string $method, string $path, array $options = []): ServerRequestInterface
-    {
-        return $this->initRequest($method, $path, $options);
     }
 
     protected function execute(ServerRequestInterface $psr7Request): ResponseInterface

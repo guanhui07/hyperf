@@ -9,17 +9,24 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Database\Model;
 
 use BadMethodCallException;
 use Closure;
 use Generator;
 use Hyperf\Collection\Arr;
+use Hyperf\Collection\Collection;
 use Hyperf\Contract\Arrayable;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
+use Hyperf\Contract\PaginatorInterface;
 use Hyperf\Database\Concerns\BuildsQueries;
+use Hyperf\Database\Model\Collection as ModelCollection;
 use Hyperf\Database\Model\Relations\Relation;
 use Hyperf\Database\Query\Builder as QueryBuilder;
+use Hyperf\Database\Query\Expression;
+use Hyperf\Paginator\Contract\CursorPaginator;
+use Hyperf\Paginator\Cursor;
 use Hyperf\Paginator\Paginator;
 use Hyperf\Stringable\Str;
 use Hyperf\Support\Traits\ForwardsCalls;
@@ -32,6 +39,7 @@ use function Hyperf\Collection\collect;
 use function Hyperf\Tappable\tap;
 
 /**
+ * @template TModel of Model
  * @mixin \Hyperf\Database\Query\Builder
  */
 class Builder
@@ -43,14 +51,14 @@ class Builder
     /**
      * The base query builder instance.
      *
-     * @var \Hyperf\Database\Query\Builder
+     * @var QueryBuilder
      */
     protected $query;
 
     /**
      * The model being queried.
      *
-     * @var \Hyperf\Database\Model\Model
+     * @var Model
      */
     protected $model;
 
@@ -88,9 +96,9 @@ class Builder
      * @var array
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql', 'insertOrIgnore',
+        'insert', 'insertGetId', 'getBindings', 'toSql', 'toRawSql', 'insertOrIgnore',
         'exists', 'doesntExist', 'count', 'min', 'max', 'avg', 'average', 'sum', 'getConnection',
-        'upsert',
+        'upsert', 'updateOrInsert', 'insertOrIgnoreUsing',
     ];
 
     /**
@@ -212,7 +220,7 @@ class Builder
     /**
      * Create and return an un-saved model instance.
      *
-     * @return \Hyperf\Database\Model\Model
+     * @return Model
      */
     public function make(array $attributes = [])
     {
@@ -223,7 +231,7 @@ class Builder
      * Register a new global scope.
      *
      * @param string $identifier
-     * @param Closure|\Hyperf\Database\Model\Scope $scope
+     * @param Closure|Scope $scope
      * @return $this
      */
     public function withGlobalScope($identifier, $scope)
@@ -240,7 +248,7 @@ class Builder
     /**
      * Remove a registered global scope.
      *
-     * @param \Hyperf\Database\Model\Scope|string $scope
+     * @param Scope|string $scope
      * @return $this
      */
     public function withoutGlobalScope($scope)
@@ -261,7 +269,7 @@ class Builder
      *
      * @return $this
      */
-    public function withoutGlobalScopes(array $scopes = null)
+    public function withoutGlobalScopes(?array $scopes = null)
     {
         if (! is_array($scopes)) {
             $scopes = array_keys($this->scopes);
@@ -346,7 +354,7 @@ class Builder
      * @param array|Closure|string $column
      * @param null|mixed $operator
      * @param null|mixed $value
-     * @return \Hyperf\Database\Model\Builder|static
+     * @return Builder|static
      */
     public function orWhere($column, $operator = null, $value = null)
     {
@@ -396,7 +404,7 @@ class Builder
     /**
      * Create a collection of models from plain arrays.
      *
-     * @return \Hyperf\Database\Model\Collection
+     * @return ModelCollection
      */
     public function hydrate(array $items)
     {
@@ -412,7 +420,7 @@ class Builder
      *
      * @param string $query
      * @param array $bindings
-     * @return \Hyperf\Database\Model\Collection
+     * @return ModelCollection
      */
     public function fromQuery($query, $bindings = [])
     {
@@ -426,7 +434,7 @@ class Builder
      *
      * @param array $columns
      * @param array|int|string $id
-     * @return null|\Hyperf\Database\Model\Collection|\Hyperf\Database\Model\Model|static|static[]
+     * @return null|Model|ModelCollection|static|static[]
      */
     public function find($id, $columns = ['*'])
     {
@@ -442,7 +450,7 @@ class Builder
      *
      * @param array|Arrayable $ids
      * @param array $columns
-     * @return \Hyperf\Database\Model\Collection
+     * @return ModelCollection
      */
     public function findMany($ids, $columns = ['*'])
     {
@@ -458,8 +466,8 @@ class Builder
      *
      * @param array $columns
      * @param mixed $id
-     * @return \Hyperf\Database\Model\Collection|\Hyperf\Database\Model\Model|static|static[]
-     * @throws \Hyperf\Database\Model\ModelNotFoundException
+     * @return Model|ModelCollection|static|static[]
+     * @throws ModelNotFoundException
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -480,11 +488,39 @@ class Builder
     }
 
     /**
+     * Find a model by its primary key or call a callback.
+     *
+     * @template TValue
+     *
+     * @param (Closure(): TValue)|list<string>|string $columns
+     * @param null|(Closure(): TValue) $callback
+     * @return (
+     *     $id is (Arrayable<array-key, mixed>|array)
+     *     ? Collection<int, TModel>
+     *     : TModel|TValue
+     * )
+     */
+    public function findOr(mixed $id, array|Closure|string $columns = ['*'], ?Closure $callback = null): mixed
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->find($id, $columns))) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    /**
      * Find a model by its primary key or return fresh model instance.
      *
      * @param array $columns
      * @param mixed $id
-     * @return \Hyperf\Database\Model\Model|static
+     * @return Model|static
      */
     public function findOrNew($id, $columns = ['*'])
     {
@@ -498,7 +534,7 @@ class Builder
     /**
      * Get the first record matching the attributes or instantiate it.
      *
-     * @return \Hyperf\Database\Model\Model|static
+     * @return Model|static
      */
     public function firstOrNew(array $attributes, array $values = [])
     {
@@ -512,7 +548,7 @@ class Builder
     /**
      * Get the first record matching the attributes or create it.
      *
-     * @return \Hyperf\Database\Model\Model|static
+     * @return Model|static
      */
     public function firstOrCreate(array $attributes, array $values = [])
     {
@@ -528,7 +564,7 @@ class Builder
     /**
      * Create or update a record matching the attributes, and fill it with values.
      *
-     * @return \Hyperf\Database\Model\Model|static
+     * @return Model|static
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
@@ -541,8 +577,8 @@ class Builder
      * Execute the query and get the first result or throw an exception.
      *
      * @param array $columns
-     * @return \Hyperf\Database\Model\Model|static
-     * @throws \Hyperf\Database\Model\ModelNotFoundException
+     * @return Model|static
+     * @throws ModelNotFoundException
      */
     public function firstOrFail($columns = ['*'])
     {
@@ -557,9 +593,9 @@ class Builder
      * Execute the query and get the first result or call a callback.
      *
      * @param array|Closure $columns
-     * @return \Hyperf\Database\Model\Model|mixed|static
+     * @return mixed|Model|static
      */
-    public function firstOr($columns = ['*'], Closure $callback = null)
+    public function firstOr($columns = ['*'], ?Closure $callback = null)
     {
         if ($columns instanceof Closure) {
             $callback = $columns;
@@ -587,10 +623,21 @@ class Builder
     }
 
     /**
+     * Get a single column's value from the first result of the query or throw an exception.
+     * @throws ModelNotFoundException<Model>
+     */
+    public function valueOrFail(Expression|string $column): mixed
+    {
+        $column = $column instanceof Expression ? $column->getValue() : $column;
+
+        return $this->firstOrFail([$column])->{Str::afterLast($column, '.')};
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param array $columns
-     * @return \Hyperf\Database\Model\Collection|static[]
+     * @return ModelCollection|static[]
      */
     public function get($columns = ['*'])
     {
@@ -642,7 +689,7 @@ class Builder
      * Get the relation instance for the given relation name.
      *
      * @param string $name
-     * @return \Hyperf\Database\Model\Relations\Relation
+     * @return Relation
      */
     public function getRelation($name)
     {
@@ -735,7 +782,7 @@ class Builder
      *
      * @param string $column
      * @param null|string $key
-     * @return \Hyperf\Collection\Collection
+     * @return Collection
      */
     public function pluck($column, $key = null)
     {
@@ -783,7 +830,7 @@ class Builder
      * @param array $columns
      * @param string $pageName
      * @param null|int $page
-     * @return \Hyperf\Contract\PaginatorInterface
+     * @return PaginatorInterface
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
@@ -800,6 +847,16 @@ class Builder
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+    }
+
+    /**
+     * Paginate the given query into a cursor paginator.
+     */
+    public function cursorPaginate(?int $perPage = null, array|string $columns = ['*'], string $cursorName = 'cursor', null|Cursor|string $cursor = null): CursorPaginator
+    {
+        $perPage = $perPage ?: $this->model->getPerPage();
+
+        return $this->paginateUsingCursor($perPage, $columns, $cursorName, $cursor);
     }
 
     /**
@@ -834,6 +891,26 @@ class Builder
     public function update(array $values)
     {
         return $this->toBase()->update($this->addUpdatedAtColumn($values));
+    }
+
+    /**
+     * Update the column's update timestamp.
+     */
+    public function touch(?string $column = null): false|int
+    {
+        $time = $this->model->freshTimestamp();
+
+        if ($column) {
+            return $this->toBase()->update([$column => $time]);
+        }
+
+        $column = $this->model->getUpdatedAtColumn();
+
+        if (! $this->model->usesTimestamps() || is_null($column)) {
+            return false;
+        }
+
+        return $this->toBase()->update([$column => $time]);
     }
 
     /**
@@ -928,7 +1005,7 @@ class Builder
     /**
      * Apply the scopes to the Model builder instance and return it.
      *
-     * @return \Hyperf\Database\Model\Builder|static
+     * @return Builder|static
      */
     public function applyScopes()
     {
@@ -997,7 +1074,7 @@ class Builder
      * Create a new instance of the model being queried.
      *
      * @param array $attributes
-     * @return \Hyperf\Database\Model\Model|static
+     * @return Model|static
      */
     public function newModelInstance($attributes = [])
     {
@@ -1019,7 +1096,7 @@ class Builder
     /**
      * Get the underlying query builder instance.
      *
-     * @return \Hyperf\Database\Query\Builder
+     * @return QueryBuilder
      */
     public function getQuery()
     {
@@ -1029,7 +1106,7 @@ class Builder
     /**
      * Set the underlying query builder instance.
      *
-     * @param \Hyperf\Database\Query\Builder $query
+     * @param QueryBuilder $query
      * @return $this
      */
     public function setQuery($query)
@@ -1042,7 +1119,7 @@ class Builder
     /**
      * Get a base query builder instance.
      *
-     * @return \Hyperf\Database\Query\Builder
+     * @return QueryBuilder
      */
     public function toBase()
     {
@@ -1074,7 +1151,7 @@ class Builder
     /**
      * Get the model instance being queried.
      *
-     * @return \Hyperf\Database\Model\Model|static
+     * @return Model|static
      */
     public function getModel()
     {
@@ -1084,7 +1161,6 @@ class Builder
     /**
      * Set a model instance for the model being queried.
      *
-     * @param \Hyperf\Database\Model\Model $model
      * @return $this
      */
     public function setModel(Model $model)
@@ -1105,6 +1181,14 @@ class Builder
     public function qualifyColumn($column)
     {
         return $this->model->qualifyColumn($column);
+    }
+
+    /**
+     * Qualify the given columns with the model's table.
+     */
+    public function qualifyColumns(array $columns): array
+    {
+        return $this->model->qualifyColumns($columns);
     }
 
     /**
@@ -1152,6 +1236,55 @@ class Builder
     }
 
     /**
+     * Get the default key name of the table.
+     */
+    protected function defaultKeyName(): string
+    {
+        return $this->getModel()->getKeyName();
+    }
+
+    /**
+     * Ensure the proper order by required for cursor pagination.
+     */
+    protected function ensureOrderForCursorPagination(bool $shouldReverse = false): Collection
+    {
+        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
+            $this->enforceOrderBy();
+        }
+
+        $reverseDirection = function ($order) {
+            if (! isset($order['direction'])) {
+                return $order;
+            }
+
+            $order['direction'] = $order['direction'] === 'asc' ? 'desc' : 'asc';
+
+            return $order;
+        };
+
+        if ($shouldReverse) {
+            $this->query->orders = collect($this->query->orders)->map($reverseDirection)->toArray();
+            $this->query->unionOrders = collect($this->query->unionOrders)->map($reverseDirection)->toArray();
+        }
+
+        $orders = ! empty($this->query->unionOrders) ? $this->query->unionOrders : $this->query->orders;
+
+        return collect($orders)
+            ->filter(fn ($order) => Arr::has($order, 'direction'))
+            ->values();
+    }
+
+    /**
+     * Get the Eloquent builder instances that are used in the union of the query.
+     */
+    protected function getUnionBuilders(): Collection
+    {
+        return isset($this->query->unions)
+            ? collect($this->query->unions)->pluck('query')
+            : collect();
+    }
+
+    /**
      * Register the given mixin with the builder.
      *
      * @param string $mixin
@@ -1165,8 +1298,6 @@ class Builder
 
         foreach ($methods as $method) {
             if ($replace || ! static::hasGlobalMacro($method->name)) {
-                $method->setAccessible(true);
-
                 static::macro($method->name, $method->invoke($mixin));
             }
         }

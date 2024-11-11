@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\ServiceGovernanceConsul;
 
 use Hyperf\Consul\AgentInterface;
@@ -38,6 +39,11 @@ class ConsulDriver implements DriverInterface
     {
         $this->logger = $container->get(StdoutLoggerInterface::class);
         $this->config = $container->get(ConfigInterface::class);
+    }
+
+    public function isLongPolling(): bool
+    {
+        return false;
     }
 
     public function getNodes(string $uri, string $name, array $metadata): array
@@ -98,6 +104,14 @@ class ConsulDriver implements DriverInterface
             $requestBody['Check'] = [
                 'DeregisterCriticalServiceAfter' => $deregisterCriticalServiceAfter,
                 'TCP' => "{$host}:{$port}",
+                'Interval' => $interval,
+            ];
+        }
+        if ($protocol === 'grpc') {
+            $requestBody['Check'] = [
+                'DeregisterCriticalServiceAfter' => $deregisterCriticalServiceAfter,
+                'GRPC' => "{$host}:{$port}",
+                'GRPCUseTLS' => false,
                 'Interval' => $interval,
             ];
         }

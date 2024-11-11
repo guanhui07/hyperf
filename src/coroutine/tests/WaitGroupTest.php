@@ -9,9 +9,11 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Coroutine;
 
 use Hyperf\Coroutine\WaitGroup;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Swoole\Coroutine;
 
@@ -19,6 +21,7 @@ use Swoole\Coroutine;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class WaitGroupTest extends TestCase
 {
     public function testWaitAgain()

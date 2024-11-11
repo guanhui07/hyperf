@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\DbConnection;
 
 use Hyperf\Context\ApplicationContext;
@@ -20,6 +21,7 @@ use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -27,6 +29,7 @@ use Psr\Container\ContainerInterface;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class TransactionalTest extends TestCase
 {
     protected function tearDown(): void

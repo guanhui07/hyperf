@@ -9,16 +9,20 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\HttpMessage\Base;
 
+use Hyperf\Engine\Http\Http;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\HttpMessage\Uri\Uri;
 use InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
+use Stringable;
+use Swow\Psr7\Message\RequestPlusInterface;
 
-class Request implements RequestInterface
+class Request implements RequestInterface, RequestPlusInterface, Stringable
 {
     use MessageTrait;
 
@@ -62,6 +66,11 @@ class Request implements RequestInterface
         }
     }
 
+    public function __toString(): string
+    {
+        return $this->toString();
+    }
+
     /**
      * Retrieves the message's request target.
      * Retrieves the message's request-target either as it will appear (for
@@ -102,9 +111,9 @@ class Request implements RequestInterface
      *
      * @see http://tools.ietf.org/html/rfc7230#section-5.3 (for the various
      *     request-target forms allowed in request messages)
-     * @param mixed $requestTarget
+     * @param string $requestTarget
      */
-    public function withRequestTarget($requestTarget): static
+    public function withRequestTarget(mixed $requestTarget): static
     {
         if (preg_match('#\s#', $requestTarget)) {
             throw new InvalidArgumentException('Invalid request target provided; cannot contain whitespace');
@@ -137,7 +146,7 @@ class Request implements RequestInterface
      * @param string $method case-sensitive method
      * @throws InvalidArgumentException for invalid HTTP methods
      */
-    public function withMethod($method): static
+    public function withMethod(mixed $method): static
     {
         $method = strtoupper($method);
         $methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'HEAD'];
@@ -201,6 +210,49 @@ class Request implements RequestInterface
         }
 
         return $new;
+    }
+
+    public function setMethod(string $method): static
+    {
+        $method = strtoupper($method);
+        $methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'HEAD'];
+        if (! in_array($method, $methods)) {
+            throw new InvalidArgumentException('Invalid Method');
+        }
+        $this->method = $method;
+        return $this;
+    }
+
+    public function setUri(string|UriInterface $uri, ?bool $preserveHost = null): static
+    {
+        $this->uri = $uri;
+
+        if (! $preserveHost) {
+            $this->updateHostFromUri();
+        }
+
+        return $this;
+    }
+
+    public function setRequestTarget(string $requestTarget): static
+    {
+        if (preg_match('#\s#', $requestTarget)) {
+            throw new InvalidArgumentException('Invalid request target provided; cannot contain whitespace');
+        }
+
+        $this->requestTarget = $requestTarget;
+        return $this;
+    }
+
+    public function toString(bool $withoutBody = false): string
+    {
+        return Http::packRequest(
+            $this->getMethod(),
+            $this->getUri()->getPath(),
+            $this->getStandardHeaders(),
+            $withoutBody ? '' : (string) $this->getBody(),
+            $this->getProtocolVersion()
+        );
     }
 
     /**

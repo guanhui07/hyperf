@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Di;
 
 use Hyperf\Di\Annotation\ScanConfig;
@@ -16,9 +17,15 @@ use Hyperf\Di\Annotation\Scanner;
 use Hyperf\Di\Exception\DirectoryNotExistException;
 use Hyperf\Di\ScanHandler\NullScanHandler;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
+/**
+ * @internal
+ * @coversNothing
+ */
+#[CoversNothing]
 /**
  * @internal
  * @coversNothing
@@ -35,7 +42,6 @@ class AnnotationTest extends TestCase
         $scanner = new Scanner(new ScanConfig(false, '/'), new NullScanHandler());
         $ref = new ReflectionClass($scanner);
         $method = $ref->getMethod('normalizeDir');
-        $method->setAccessible(true);
 
         $this->expectException(DirectoryNotExistException::class);
         $method->invokeArgs($scanner, [['/not_exists']]);
@@ -46,7 +52,6 @@ class AnnotationTest extends TestCase
         $scanner = new Scanner(new ScanConfig(false, '/'), new NullScanHandler());
         $ref = new ReflectionClass($scanner);
         $method = $ref->getMethod('normalizeDir');
-        $method->setAccessible(true);
 
         $this->assertSame([], $method->invokeArgs($scanner, [[]]));
     }

@@ -9,10 +9,10 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Coordinator;
 
-use Closure;
-use Hyperf\Contract\StdoutLoggerInterface;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 use function Hyperf\Coroutine\go;
@@ -29,11 +29,11 @@ class Timer
 
     private static int $round = 0;
 
-    public function __construct(private ?StdoutLoggerInterface $logger = null)
+    public function __construct(private ?LoggerInterface $logger = null)
     {
     }
 
-    public function after(float $timeout, Closure $closure, string $identifier = Constants::WORKER_EXIT): int
+    public function after(float $timeout, callable $closure, string $identifier = Constants::WORKER_EXIT): int
     {
         $id = ++$this->id;
         $this->closures[$id] = true;
@@ -56,7 +56,7 @@ class Timer
         return $id;
     }
 
-    public function tick(float $timeout, Closure $closure, string $identifier = Constants::WORKER_EXIT): int
+    public function tick(float $timeout, callable $closure, string $identifier = Constants::WORKER_EXIT): int
     {
         $id = ++$this->id;
         $this->closures[$id] = true;
@@ -94,7 +94,7 @@ class Timer
         return $id;
     }
 
-    public function until(Closure $closure, string $identifier = Constants::WORKER_EXIT): int
+    public function until(callable $closure, string $identifier = Constants::WORKER_EXIT): int
     {
         return $this->after(-1, $closure, $identifier);
     }

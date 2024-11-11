@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\HttpServer;
 
 use Hyperf\Context\ApplicationContext;
@@ -25,6 +26,7 @@ use Hyperf\HttpServer\ResponseEmitter;
 use Hyperf\Support\SafeCaller;
 use HyperfTest\HttpServer\Stub\ServerStub;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
@@ -35,6 +37,7 @@ use Swoole\Http\Response;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ServerTest extends TestCase
 {
     protected function tearDown(): void

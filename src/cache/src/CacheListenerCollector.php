@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Cache;
 
 use Hyperf\Di\MetadataCollector;
@@ -20,14 +21,6 @@ class CacheListenerCollector extends MetadataCollector
     public static function setListener(string $listener, array $value)
     {
         static::$container[$listener] = $value;
-    }
-
-    /**
-     * @deprecated
-     */
-    public static function getListner(string $listener, ?array $default = null)
-    {
-        return self::getListener($listener, $default);
     }
 
     public static function getListener(string $listener, ?array $default = null)

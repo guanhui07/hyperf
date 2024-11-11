@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Database\PgSQL\Schema;
 
 use Hyperf\Database\PgSQL\Query\Processors\PostgresProcessor;
@@ -57,6 +58,16 @@ class PostgresBuilder extends Builder
             $this->grammar->compileTableExists(),
             [$schema, $table]
         )) > 0;
+    }
+
+    /**
+     * Get the tables that belong to the database.
+     */
+    public function getTables(): array
+    {
+        return $this->connection->getPostProcessor()->processTables(
+            $this->connection->selectFromWriteConnection($this->grammar->compileTables())
+        );
     }
 
     /**
@@ -152,6 +163,25 @@ class PostgresBuilder extends Builder
     }
 
     /**
+     * Determine if the given view exists.
+     */
+    public function hasView(string $view): bool
+    {
+        [$schema, $view] = $this->parseSchemaAndTable($view);
+
+        $view = $this->connection->getTablePrefix() . $view;
+
+        foreach ($this->getViews() as $value) {
+            if (strtolower($view) === strtolower($value['name'])
+                && strtolower($schema) === strtolower($value['schema'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get all of the type names for the database.
      *
      * @return array
@@ -185,12 +215,23 @@ class PostgresBuilder extends Builder
     }
 
     /**
-     * Get the column type listing for a given table.
-     *
-     * @param string $table
-     * @return array
+     * Get the foreign keys for a given table.
      */
-    public function getColumnTypeListing($table)
+    public function getForeignKeys(string $table): array
+    {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
+        $table = $this->connection->getTablePrefix() . $table;
+
+        return $this->connection->getPostProcessor()->processForeignKeys(
+            $this->connection->selectFromWriteConnection($this->grammar->compileForeignKeys($schema, $table))
+        );
+    }
+
+    /**
+     * Get the column type listing for a given table.
+     */
+    public function getColumnTypeListing(string $table, ?string $database = null): array
     {
         [$schema, $table] = $this->parseSchemaAndTable($table);
 
@@ -198,12 +239,26 @@ class PostgresBuilder extends Builder
 
         $results = $this->connection->select(
             $this->grammar->compileColumnListing(),
-            [$this->connection->getDatabaseName(), $schema, $table]
+            [$database ?? $this->connection->getDatabaseName(), $schema, $table]
         );
 
         /** @var PostgresProcessor $processor */
         $processor = $this->connection->getPostProcessor();
         return $processor->processListing($results);
+    }
+
+    /**
+     * Get the indexes for a given table.
+     */
+    public function getIndexes(string $table): array
+    {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
+        $table = $this->connection->getTablePrefix() . $table;
+
+        return $this->connection->getPostProcessor()->processIndexes(
+            $this->connection->selectFromWriteConnection($this->grammar->compileIndexes($schema, $table))
+        );
     }
 
     /**

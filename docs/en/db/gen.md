@@ -8,7 +8,7 @@ php bin/hyperf.php gen:model table_name
 
 ## Create a model
 
-The optional parameters are as follows：
+The optional parameters are as follows:
 
 |     Parameter      |  Type  |             Defaults              |                                             Remark                                             |
 |:------------------:|:------:|:---------------------------------:|:----------------------------------------------------------------------------------------------:|
@@ -77,24 +77,18 @@ class User extends Model
 {
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'user';
+    protected ?string $table = 'user';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'name', 'gender', 'created_at', 'updated_at'];
+    protected array $fillable = ['id', 'name', 'gender', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'gender' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'gender' => 'integer'];
 }
 ```
 
@@ -141,7 +135,10 @@ This `Visitor` can generate corresponding `getters` and `setters` based on datab
 
 ## Override Visitor
 
-In the Hyperf framework, when `gen:model` is used, `decimal` is converted to `float` by default. as follows:
+In the Hyperf framework, when `gen:model` is used. By default, only `tinyint, smallint, mediumint, int, bigint` is declared as type int, `bool, boolean` is declared as type boolean, and other data types are defaulted to `string`. You can override adjustments. 
+
+as follows:
+
 ```php
 <?php
 
@@ -152,7 +149,7 @@ namespace App\Model;
 /**
  * @property int $id
  * @property int $count
- * @property float $float_num // decimal
+ * @property string $float_num // decimal
  * @property string $str
  * @property string $json
  * @property \Carbon\Carbon $created_at
@@ -162,24 +159,18 @@ class UserExt extends Model
 {
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'user_ext';
+    protected ?string $table = 'user_ext';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'count', 'float_num', 'str', 'json', 'created_at', 'updated_at'];
+    protected array $fillable = ['id', 'count', 'float_num', 'str', 'json', 'created_at', 'updated_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'count' => 'integer', 'float_num' => 'float', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'count' => 'integer', 'float_num' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }
 
 ```
@@ -201,7 +192,7 @@ declare(strict_types=1);
 namespace App\Kernel\Visitor;
 
 use Hyperf\Database\Commands\Ast\ModelUpdateVisitor as Visitor;
-use Hyperf\Utils\Str;
+use Hyperf\Stringable\Str;
 
 class ModelUpdateVisitor extends Visitor
 {
@@ -288,21 +279,15 @@ class UserExt extends Model
 {
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'user_ext';
+    protected ?string $table = 'user_ext';
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'count', 'float_num', 'str', 'json', 'created_at', 'updated_at'];
+    protected array $fillable = ['id', 'count', 'float_num', 'str', 'json', 'created_at', 'updated_at'];
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'count' => 'integer', 'float_num' => 'decimal:2', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'count' => 'integer', 'float_num' => 'decimal:2', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }
 ```

@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Cache\Annotation;
 
 use Attribute;
@@ -32,7 +33,8 @@ class CacheAhead extends AbstractAnnotation
         public int $lockSeconds = 10,
         public int $offset = 0,
         public string $group = 'default',
-        public bool $collect = false
+        public bool $collect = false,
+        public ?array $skipCacheResults = null
     ) {
     }
 

@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Metric\Listener;
 
 use Hyperf\Command\Event\AfterExecute;
@@ -60,6 +61,10 @@ class OnBeforeHandle implements ListenerInterface
     {
         if ($event instanceof AfterExecute) {
             CoordinatorManager::until(Constants::WORKER_EXIT)->resume();
+            return;
+        }
+
+        if (! $this->config->get('metric.enable_command_metric', true)) {
             return;
         }
 

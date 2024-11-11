@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\ModelCache\Handler;
 
 use Hyperf\Contract\Arrayable;
@@ -117,7 +118,7 @@ class RedisHandler implements HandlerInterface, DefaultValueInterface
 
     public function deleteMultiple($keys): bool
     {
-        return $this->redis->del(...$keys) > 0;
+        return (bool) $this->redis->del(...$keys);
     }
 
     public function has($key): bool

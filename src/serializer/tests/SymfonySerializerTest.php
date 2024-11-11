@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Serializer;
 
 use Hyperf\Serializer\SerializerFactory;
 use Hyperf\Serializer\SymfonyNormalizer;
 use HyperfTest\Serializer\Stub\Foo;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
@@ -22,6 +24,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class SymfonySerializerTest extends TestCase
 {
     public function testNormalize()

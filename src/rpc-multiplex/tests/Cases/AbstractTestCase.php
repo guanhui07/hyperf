@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\RpcMultiplex\Cases;
 
 use Mockery;
@@ -29,7 +30,6 @@ abstract class AbstractTestCase extends TestCase
     {
         $ref = new ReflectionClass($class);
         $method = $ref->getMethod($method);
-        $method->setAccessible(true);
         return $method->invoke($method);
     }
 }

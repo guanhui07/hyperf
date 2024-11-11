@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\ConfigApollo;
 
 use Hyperf\ConfigApollo\ClientInterface as ApolloClientInterface;
@@ -76,7 +77,7 @@ class ApolloDriver extends AbstractDriver
                         break;
                     }
                     $config = $this->client->parallelPull($namespaces);
-                    if ($config !== $prevConfig) {
+                    if ($this->configChanged($config, $prevConfig)) {
                         $this->syncConfig($config, $prevConfig);
                         $prevConfig = $config;
                     }
@@ -85,6 +86,13 @@ class ApolloDriver extends AbstractDriver
                 }
             }
         });
+    }
+
+    protected function configChanged(array $config, array $prevConfig): bool
+    {
+        ksort($config);
+
+        return $config !== $prevConfig;
     }
 
     protected function loop(callable $callable, ?Channel $channel = null): int

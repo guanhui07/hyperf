@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Database\Query\Grammars;
 
 use Hyperf\Collection\Arr;
@@ -16,6 +17,7 @@ use Hyperf\Database\Grammar as BaseGrammar;
 use Hyperf\Database\Query\Builder;
 use Hyperf\Database\Query\Expression;
 use Hyperf\Database\Query\JoinClause;
+use Hyperf\Database\Query\JoinLateralClause;
 use Hyperf\Stringable\Str;
 use RuntimeException;
 
@@ -161,24 +163,33 @@ class Grammar extends BaseGrammar
      */
     public function compileInsertUsing(Builder $query, array $columns, string $sql): string
     {
-        return "insert into {$this->wrapTable($query->from)} ({$this->columnize($columns)}) {$sql}";
+        $table = $this->wrapTable($query->from);
+        if (empty($columns) || $columns === ['*']) {
+            return "insert into {$table} {$sql}";
+        }
+
+        return "insert into {$table} ({$this->columnize($columns)}) {$sql}";
+    }
+
+    /**
+     * Compile an insert ignore statement using a subquery into SQL.
+     */
+    public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql): string
+    {
+        throw new RuntimeException('This database engine does not support inserting while ignoring errors.');
     }
 
     /**
      * Compile an update statement into SQL.
-     *
-     * @param array $values
      */
-    public function compileUpdate(Builder $query, $values): string
+    public function compileUpdate(Builder $query, array $values): string
     {
         $table = $this->wrapTable($query->from);
 
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
         // the values in the list of bindings so we can make the sets statements.
-        $columns = collect($values)->map(function ($value, $key) {
-            return $this->wrap($key) . ' = ' . $this->parameter($value);
-        })->implode(', ');
+        $columns = $this->compileUpdateColumns($query, $values);
 
         // If the query has any "join" clauses, we will setup the joins on the builder
         // and compile them so we can attach them to this update, as update queries
@@ -311,6 +322,83 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Substitute the given bindings into the given raw SQL query.
+     *
+     * @param string $sql
+     * @param array $bindings
+     * @return string
+     */
+    public function substituteBindingsIntoRawSql($sql, $bindings)
+    {
+        $query = '';
+
+        $isStringLiteral = false;
+
+        for ($i = 0; $i < strlen($sql); ++$i) {
+            $char = $sql[$i];
+            $nextChar = $sql[$i + 1] ?? null;
+
+            // Single quotes can be escaped as '' according to the SQL standard while
+            // MySQL uses \'. Postgres has operators like ?| that must get encoded
+            // in PHP like ??|. We should skip over the escaped characters here.
+            if (in_array($char . $nextChar, ["\\'", "''", '??'])) {
+                $query .= $char . $nextChar;
+                ++$i;
+            } elseif ($char === "'") { // Starting / leaving string literal...
+                $query .= $char;
+                $isStringLiteral = ! $isStringLiteral;
+            } elseif ($char === '?' && ! $isStringLiteral) { // Substitutable binding...
+                $query .= array_shift($bindings) ?? '?';
+            } else { // Normal character...
+                $query .= $char;
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * Compile a "lateral join" clause.
+     *
+     * @throws RuntimeException
+     */
+    public function compileJoinLateral(JoinLateralClause $join, string $expression): string
+    {
+        throw new RuntimeException('This database engine does not support lateral joins.');
+    }
+
+    /**
+     * Compile the columns for an update statement.
+     */
+    protected function compileUpdateColumns(Builder $query, array $values): string
+    {
+        return collect($values)->map(function ($value, $key) {
+            return $this->wrap($key) . ' = ' . $this->parameter($value);
+        })->implode(', ');
+    }
+
+    /**
+     * Compile a "where JSON overlaps" clause.
+     */
+    protected function whereJsonOverlaps(Builder $query, array $where): string
+    {
+        $not = $where['not'] ? 'not ' : '';
+
+        return $not . $this->compileJsonOverlaps(
+            $where['column'],
+            $this->parameter($where['value'])
+        );
+    }
+
+    /**
+     * Compile a "JSON overlaps" statement into SQL.
+     */
+    protected function compileJsonOverlaps(string $column, string $value): string
+    {
+        throw new RuntimeException('This database engine does not support JSON overlaps operations.');
+    }
+
+    /**
      * Compile the components necessary for a select clause.
      */
     protected function compileComponents(Builder $query): array
@@ -376,14 +464,6 @@ class Grammar extends BaseGrammar
      */
     protected function compileFrom(Builder $query, $table): string
     {
-        if ($query->forceIndexes) {
-            $forceIndexes = [];
-            foreach ($query->forceIndexes as $forceIndex) {
-                $forceIndexes[] = $this->wrapValue($forceIndex);
-            }
-            return 'from ' . $this->wrapTable($table) . ' force index (' . implode(',', $forceIndexes) . ')';
-        }
-
         return 'from ' . $this->wrapTable($table);
     }
 
@@ -400,6 +480,10 @@ class Grammar extends BaseGrammar
             $nestedJoins = is_null($join->joins) ? '' : ' ' . $this->compileJoins($query, $join->joins);
 
             $tableAndNestedJoins = is_null($join->joins) ? $table : '(' . $table . $nestedJoins . ')';
+
+            if ($join instanceof JoinLateralClause) {
+                return $this->compileJoinLateral($join, $tableAndNestedJoins);
+            }
 
             return trim("{$join->type} join {$tableAndNestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
@@ -430,7 +514,7 @@ class Grammar extends BaseGrammar
     /**
      * Get an array of all the where clauses for the query.
      *
-     * @param \Hyperf\Database\Query\Builder $query
+     * @param Builder $query
      */
     protected function compileWheresToArray($query): array
     {
@@ -442,7 +526,7 @@ class Grammar extends BaseGrammar
     /**
      * Format the where clause statements into one string.
      *
-     * @param \Hyperf\Database\Query\Builder $query
+     * @param Builder $query
      * @param array $sql
      */
     protected function concatenateWhereClauses($query, $sql): string
@@ -478,7 +562,6 @@ class Grammar extends BaseGrammar
     /**
      * Compile a "where JSON boolean" clause.
      *
-     * @param string $value
      * @param array $where
      * @return string
      */
@@ -919,9 +1002,7 @@ class Grammar extends BaseGrammar
     protected function compileOrdersToArray(Builder $query, $orders): array
     {
         return array_map(function ($order) {
-            return ! isset($order['sql'])
-                ? $this->wrap($order['column']) . ' ' . $order['direction']
-                : $order['sql'];
+            return $order['sql'] ?? $this->wrap($order['column']) . ' ' . $order['direction'];
         }, $orders);
     }
 

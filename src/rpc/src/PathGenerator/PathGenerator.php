@@ -9,10 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Rpc\PathGenerator;
 
 use Hyperf\Rpc\Contract\PathGeneratorInterface;
 use Hyperf\Stringable\Str;
+use Hyperf\Stringable\StrCache;
 
 class PathGenerator implements PathGeneratorInterface
 {
@@ -20,7 +22,7 @@ class PathGenerator implements PathGeneratorInterface
     {
         $handledNamespace = explode('\\', $service);
         $handledNamespace = Str::replaceLast('Service', '', end($handledNamespace));
-        $path = Str::snake($handledNamespace);
+        $path = StrCache::snake($handledNamespace);
 
         if ($path[0] !== '/') {
             $path = '/' . $path;

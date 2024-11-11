@@ -9,18 +9,21 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Di;
 
 use Closure;
 use Hyperf\Di\ClosureDefinitionCollector;
 use Hyperf\Di\ReflectionType;
 use HyperfTest\Di\Stub\Foo;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ClosureDefinitionTest extends TestCase
 {
     protected function tearDown(): void

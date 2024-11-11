@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Redis\Lua;
 
 use Hyperf\Redis\Lua\Hash\HGetAllMultiple;
@@ -16,6 +17,7 @@ use Hyperf\Redis\Lua\Hash\HIncrByFloatIfExists;
 use Hyperf\Stringable\Str;
 use HyperfTest\Redis\Stub\ContainerStub;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Redis;
 
@@ -23,6 +25,7 @@ use Redis;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class HashTest extends TestCase
 {
     protected function tearDown(): void

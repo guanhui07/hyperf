@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Collection;
 
 use Closure;
@@ -43,18 +44,15 @@ function data_fill(&$target, $key, $value)
 /**
  * Get an item from an array or object using "dot" notation.
  *
- * @param mixed $target
  * @param null|array|int|string $key
- * @param mixed $default
- * @return mixed
  */
-function data_get($target, $key, $default = null)
+function data_get(mixed $target, mixed $key, mixed $default = null): mixed
 {
     if (is_null($key)) {
         return $target;
     }
 
-    $key = is_array($key) ? $key : explode('.', $key);
+    $key = is_array($key) ? $key : explode('.', (string) $key);
 
     foreach ($key as $i => $segment) {
         unset($key[$i]);
@@ -152,6 +150,42 @@ function data_set(&$target, $key, $value, $overwrite = true)
     return $target;
 }
 
+if (! function_exists('data_forget')) {
+    /**
+     * Remove / unset an item from an array or object using "dot" notation.
+     *
+     * @param mixed $target
+     * @param null|array|int|string $key
+     * @return mixed
+     */
+    function data_forget(&$target, $key)
+    {
+        $segments = is_array($key) ? $key : explode('.', $key);
+
+        if (($segment = array_shift($segments)) === '*' && Arr::accessible($target)) {
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    data_forget($inner, $segments);
+                }
+            }
+        } elseif (Arr::accessible($target)) {
+            if ($segments && Arr::exists($target, $segment)) {
+                data_forget($target[$segment], $segments);
+            } else {
+                Arr::forget($target, $segment);
+            }
+        } elseif (is_object($target)) {
+            if ($segments && isset($target->{$segment})) {
+                data_forget($target->{$segment}, $segments);
+            } elseif (isset($target->{$segment})) {
+                unset($target->{$segment});
+            }
+        }
+
+        return $target;
+    }
+}
+
 /**
  * Get the first element of an array. Useful for method chaining.
  *
@@ -176,9 +210,12 @@ function last($array)
 
 /**
  * Return the default value of the given value.
+ * @template TValue
+ * @template TReturn
  *
+ * @param (Closure():TReturn)|TValue $value
  * @param mixed ...$args
- * @return mixed
+ * @return ($value is Closure ? TReturn : TValue)
  */
 function value(mixed $value, ...$args)
 {

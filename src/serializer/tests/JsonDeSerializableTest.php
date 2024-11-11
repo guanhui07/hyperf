@@ -9,16 +9,19 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Serializer;
 
 use Hyperf\Codec\Json;
 use Hyperf\Serializer\JsonDeNormalizer;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class JsonDeSerializableTest extends TestCase
 {
     public function testJsonDeSerializable()

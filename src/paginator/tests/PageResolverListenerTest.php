@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Paginator;
 
 use Hyperf\Context\ApplicationContext;
@@ -21,6 +22,7 @@ use Hyperf\Paginator\LengthAwarePaginator;
 use Hyperf\Paginator\Listener\PageResolverListener;
 use Hyperf\Paginator\Paginator;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface as PsrServerRequestInterface;
 
@@ -30,6 +32,7 @@ use function Hyperf\Support\value;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class PageResolverListenerTest extends TestCase
 {
     protected function setUp(): void

@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\LoadBalancer;
 
 use InvalidArgumentException;
@@ -17,6 +18,9 @@ use function Hyperf\Support\make;
 
 class LoadBalancerManager
 {
+    /**
+     * @var array<string, class-string<LoadBalancerInterface>>
+     */
     private array $algorithms = [
         'random' => Random::class,
         'round-robin' => RoundRobin::class,
@@ -25,12 +29,13 @@ class LoadBalancerManager
     ];
 
     /**
-     * @var LoadBalancerInterface[]
+     * @var array<string, LoadBalancerInterface>
      */
     private array $instances = [];
 
     /**
      * Retrieve a class name of load balancer.
+     * @return class-string<LoadBalancerInterface>
      */
     public function get(string $name): string
     {
@@ -53,7 +58,7 @@ class LoadBalancerManager
             return $this->instances[$key];
         }
         $class = $this->get($algorithm);
-        if (function_exists('make')) {
+        if (function_exists('Hyperf\Support\make')) {
             $instance = make($class);
         } else {
             $instance = new $class();
@@ -72,6 +77,7 @@ class LoadBalancerManager
 
     /**
      * Override the algorithms.
+     * @param array<string, class-string<LoadBalancerInterface>> $algorithms
      */
     public function set(array $algorithms): static
     {
@@ -86,6 +92,7 @@ class LoadBalancerManager
 
     /**
      * Register an algorithm to the manager.
+     * @param class-string<LoadBalancerInterface> $algorithm
      */
     public function register(string $key, string $algorithm): self
     {

@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Database\PgSQL;
 
 use Exception;
 use Generator;
 use Hyperf\Database\Connection;
 use Hyperf\Database\Exception\QueryException;
+use Hyperf\Database\Grammar;
 use Hyperf\Database\PgSQL\Concerns\PostgreSqlSwooleExtManagesTransactions;
 use Hyperf\Database\PgSQL\DBAL\PostgresDriver;
 use Hyperf\Database\PgSQL\Query\Grammars\PostgresSqlSwooleExtGrammar as QueryGrammar;
@@ -151,10 +153,21 @@ class PostgreSqlSwooleExtConnection extends Connection
             throw new QueryException($query, [], new Exception($statement->error));
         }
 
-        return $statement->fetchAll(SW_PGSQL_ASSOC);
+        return $statement->fetchAll();
     }
 
-    public function str_replace_once($needle, $replace, $haystack)
+    /**
+     * @param string $needle
+     * @param string $replace
+     * @param string $haystack
+     * @deprecated ,using `strReplaceOnce` instead
+     */
+    public function str_replace_once($needle, $replace, $haystack): array|string
+    {
+        return $this->strReplaceOnce($needle, $replace, $haystack);
+    }
+
+    public function strReplaceOnce(string $needle, string $replace, string $haystack): array|string
     {
         // Looks for the first occurence of $needle in $haystack
         // and replaces it with $replace.
@@ -184,7 +197,7 @@ class PostgreSqlSwooleExtConnection extends Connection
 
     /**
      * Get the default query grammar instance.
-     * @return \Hyperf\Database\Grammar
+     * @return Grammar
      */
     protected function getDefaultQueryGrammar(): QueryGrammar
     {
@@ -219,7 +232,7 @@ class PostgreSqlSwooleExtConnection extends Connection
     {
         $num = 1;
         while (strpos($query, '?')) {
-            $query = $this->str_replace_once('?', '$' . $num++, $query);
+            $query = $this->strReplaceOnce('?', '$' . $num++, $query);
         }
 
         /** @var PostgreSQL $pdo */

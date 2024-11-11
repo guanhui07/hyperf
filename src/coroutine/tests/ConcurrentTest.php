@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Coroutine;
 
 use Exception;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Coroutine\Concurrent;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Swoole\Coroutine;
@@ -23,6 +25,7 @@ use Swoole\Coroutine;
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class ConcurrentTest extends TestCase
 {
     protected function setUp(): void

@@ -9,10 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Stringable;
 
 use ArrayAccess;
 use Closure;
+use Hyperf\Collection\Collection;
 use Hyperf\Conditionable\Conditionable;
 use Hyperf\Macroable\Macroable;
 use Hyperf\Tappable\Tappable;
@@ -86,6 +88,16 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
     }
 
     /**
+     * Convert the given string to APA-style title case.
+     *
+     * @return static
+     */
+    public function apa()
+    {
+        return new static(Str::apa($this->value));
+    }
+
+    /**
      * Append the given values to the string.
      *
      * @param string $values
@@ -127,6 +139,28 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
     public function charAt($index)
     {
         return Str::charAt($this->value, $index);
+    }
+
+    /**
+     * Remove the given string if it exists at the end of the current string.
+     *
+     * @param array|string $needle
+     * @return static
+     */
+    public function chopEnd($needle)
+    {
+        return new static(Str::chopEnd($this->value, $needle));
+    }
+
+    /**
+     * Remove the given string if it exists at the start of the current string.
+     *
+     * @param array|string $needle
+     * @return static
+     */
+    public function chopStart($needle)
+    {
+        return new static(Str::chopStart($this->value, $needle));
     }
 
     /**
@@ -246,7 +280,7 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
      *
      * @param string $delimiter
      * @param int $limit
-     * @return \Hyperf\Collection\Collection
+     * @return Collection
      */
     public function explode($delimiter, $limit = PHP_INT_MAX)
     {
@@ -259,7 +293,7 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
      * @param int|string $pattern
      * @param int $limit
      * @param int $flags
-     * @return \Hyperf\Collection\Collection
+     * @return Collection
      */
     public function split($pattern, $limit = -1, $flags = 0)
     {
@@ -295,6 +329,16 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
     }
 
     /**
+     * Determine if a given string is 7 bit ASCII.
+     *
+     * @return bool
+     */
+    public function isAscii()
+    {
+        return Str::isAscii($this->value);
+    }
+
+    /**
      * Determine if the given string is empty.
      *
      * @return bool
@@ -317,6 +361,11 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
     public function isUlid(): bool
     {
         return Str::isUlid($this->value);
+    }
+
+    public function isUrl(): bool
+    {
+        return Str::isUrl($this->value);
     }
 
     public function isUuid(): bool
@@ -399,7 +448,7 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
      * Get the string matching the given pattern.
      *
      * @param string $pattern
-     * @return \Hyperf\Collection\Collection
+     * @return Collection
      */
     public function matchAll($pattern)
     {
@@ -503,6 +552,19 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
     }
 
     /**
+     * Find the multi-byte safe position of the first occurrence of the given substring.
+     *
+     * @param string $needle
+     * @param int $offset
+     * @param null|string $encoding
+     * @return false|int
+     */
+    public function position($needle, $offset = 0, $encoding = null)
+    {
+        return Str::position($this->value, $needle, $offset, $encoding);
+    }
+
+    /**
      * Prepend the given values to the string.
      *
      * @param string $values
@@ -592,11 +654,7 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
      */
     public function replaceMatches($pattern, $replace, $limit = -1)
     {
-        if ($replace instanceof Closure) {
-            return new static(preg_replace_callback($pattern, $replace, $this->value, $limit));
-        }
-
-        return new static(preg_replace($pattern, $replace, $this->value, $limit));
+        return new static(Str::replaceMatches($pattern, $replace, $this->value, $limit));
     }
 
     /**
@@ -639,6 +697,16 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
     public function title()
     {
         return new static(Str::title($this->value));
+    }
+
+    /**
+     * Convert the given string to proper case for each word.
+     *
+     * @return static
+     */
+    public function headline()
+    {
+        return new static(Str::headline($this->value));
     }
 
     /**
@@ -721,6 +789,30 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
     }
 
     /**
+     * Take the first or last {$limit} characters.
+     *
+     * @return static
+     */
+    public function take(int $limit)
+    {
+        if ($limit < 0) {
+            return $this->substr($limit);
+        }
+
+        return $this->substr(0, $limit);
+    }
+
+    /**
+     * Convert the string to Base64 encoding.
+     *
+     * @return static
+     */
+    public function toBase64()
+    {
+        return new static(base64_encode($this->value));
+    }
+
+    /**
      * Trim the string of the given characters.
      *
      * @param string $characters
@@ -728,7 +820,7 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
      */
     public function trim($characters = null)
     {
-        return new static(trim(...array_merge([$this->value], func_get_args())));
+        return new static(Str::trim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
@@ -739,7 +831,7 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
      */
     public function ltrim($characters = null)
     {
-        return new static(ltrim(...array_merge([$this->value], func_get_args())));
+        return new static(Str::ltrim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
@@ -750,7 +842,7 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
      */
     public function rtrim($characters = null)
     {
-        return new static(rtrim(...array_merge([$this->value], func_get_args())));
+        return new static(Str::rtrim(...array_merge([$this->value], func_get_args())));
     }
 
     /**
@@ -761,6 +853,18 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
     public function ucfirst()
     {
         return new static(Str::ucfirst($this->value));
+    }
+
+    /**
+     * Unwrap the string with the given strings.
+     *
+     * @param string $before
+     * @param null|string $after
+     * @return static
+     */
+    public function unwrap($before, $after = null)
+    {
+        return new static(Str::unwrap($this->value, $before, $after));
     }
 
     /**
@@ -859,5 +963,157 @@ class Stringable implements JsonSerializable, \Stringable, ArrayAccess
     public function offsetUnset(mixed $offset): void
     {
         unset($this->value[$offset]);
+    }
+
+    public function betweenFirst($from, $to): static
+    {
+        return new static(Str::betweenFirst($this->value, $from, $to));
+    }
+
+    public function classNamespace(): static
+    {
+        return new static(Str::classNamespace($this->value));
+    }
+
+    public function convertCase($mode = MB_CASE_FOLD, $encoding = 'UTF-8'): static
+    {
+        return new static(Str::convertCase($this->value, $mode, $encoding));
+    }
+
+    public function excerpt($phrase = '', $options = []): ?string
+    {
+        return Str::excerpt($this->value, $phrase, $options);
+    }
+
+    public function isJson(): bool
+    {
+        return Str::isJson($this->value);
+    }
+
+    public function lcfirst(): static
+    {
+        return new static(Str::lcfirst($this->value));
+    }
+
+    public function newLine($count = 1): static
+    {
+        return $this->append(str_repeat(PHP_EOL, $count));
+    }
+
+    public function replaceStart($search, $replace): static
+    {
+        return new static(Str::replaceStart($search, $replace, $this->value));
+    }
+
+    public function replaceEnd($search, $replace): static
+    {
+        return new static(Str::replaceEnd($search, $replace, $this->value));
+    }
+
+    public function reverse(): static
+    {
+        return new static(Str::reverse($this->value));
+    }
+
+    public function scan($format): Collection
+    {
+        return collect(sscanf($this->value, $format));
+    }
+
+    public function squish(): static
+    {
+        return new static(Str::squish($this->value));
+    }
+
+    public function substrReplace($replace, $offset = 0, $length = null): static
+    {
+        return new static(Str::substrReplace($this->value, $replace, $offset, $length));
+    }
+
+    public function swap(array $map)
+    {
+        return new static(strtr($this->value, $map));
+    }
+
+    public function toString(): string
+    {
+        return $this->value;
+    }
+
+    public function ucsplit(): Collection
+    {
+        return collect(Str::ucsplit($this->value));
+    }
+
+    public function value(): string
+    {
+        return $this->toString();
+    }
+
+    public function whenContains($needles, $callback, $default = null)
+    {
+        return $this->when($this->contains($needles), $callback, $default);
+    }
+
+    public function whenContainsAll(array $needles, $callback, $default = null)
+    {
+        return $this->when($this->containsAll($needles), $callback, $default);
+    }
+
+    public function whenEndsWith($needles, $callback, $default = null)
+    {
+        return $this->when($this->endsWith($needles), $callback, $default);
+    }
+
+    public function whenExactly($needles, $callback, $default = null)
+    {
+        return $this->when($this->exactly($needles), $callback, $default);
+    }
+
+    public function whenIs($pattern, $callback, $default = null)
+    {
+        return $this->when($this->is($pattern), $callback, $default);
+    }
+
+    public function whenIsUlid($callback, $default = null)
+    {
+        return $this->when($this->isUlid(), $callback, $default);
+    }
+
+    public function whenIsUuid($callback, $default = null)
+    {
+        return $this->when($this->isUuid(), $callback, $default);
+    }
+
+    public function whenNotExactly($needles, $callback, $default = null)
+    {
+        return $this->when(! $this->exactly($needles), $callback, $default);
+    }
+
+    public function whenStartsWith($needles, $callback, $default = null)
+    {
+        return $this->when($this->startsWith($needles), $callback, $default);
+    }
+
+    public function whenTest($pattern, $callback, $default = null)
+    {
+        return $this->when($this->test($pattern), $callback, $default);
+    }
+
+    public function wrap($before, $after = null)
+    {
+        return new static(Str::wrap($this->value, $before, $after));
+    }
+
+    /**
+     * Wrap a string to a given number of characters.
+     *
+     * @param mixed $characters
+     * @param mixed $break
+     * @param mixed $cutLongWords
+     */
+    public function wordWrap($characters = 75, $break = "\n", $cutLongWords = false): static
+    {
+        return new static(Str::wordWrap($this->value, $characters, $break, $cutLongWords));
     }
 }

@@ -9,17 +9,20 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\Paginator;
 
 use Hyperf\Codec\Json;
 use Hyperf\Paginator\LengthAwarePaginator;
 use Hyperf\Paginator\Paginator;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class LengthAwarePaginatorTest extends TestCase
 {
     public function testNextPageUrl()
@@ -46,6 +49,18 @@ class LengthAwarePaginatorTest extends TestCase
         $paginator = new LengthAwarePaginator([1, 2], 10, 2, 2);
         $paginator = $paginator->appends('keyword', 'Hyperf');
         $this->assertSame('/?keyword=Hyperf&page=1', $paginator->url(1));
+
+        $paginator = new LengthAwarePaginator([1, 2], 10, 2, 2);
+        $paginator = $paginator->appends('frameworks', []);
+        $this->assertSame('/?page=1', $paginator->url(1));
+
+        $paginator = new LengthAwarePaginator([1, 2], 10, 2, 2);
+        $paginator = $paginator->appends('frameworks', ['Hyperf', 'Laravel']);
+        $this->assertSame('/?frameworks%5B0%5D=Hyperf&frameworks%5B1%5D=Laravel&page=1', $paginator->url(1));
+
+        $paginator = new LengthAwarePaginator([1, 2], 10, 2, 2);
+        $paginator = $paginator->appends('settings', ['id' => '1', 'name' => 'Hyperf']);
+        $this->assertSame('/?settings%5Bid%5D=1&settings%5Bname%5D=Hyperf&page=1', $paginator->url(1));
     }
 
     public function testToArray()

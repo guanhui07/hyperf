@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Amqp;
 
 use Hyperf\Amqp\Exception\NotSupportedException;
@@ -29,14 +30,14 @@ class ConnectionFactory
     /**
      * @var AMQPConnection[][]
      */
-    protected $connections = [];
+    protected array $connections = [];
 
     public function __construct(protected ContainerInterface $container)
     {
         $this->config = $this->container->get(ConfigInterface::class);
     }
 
-    public function refresh(string $pool)
+    public function refresh(string $pool): void
     {
         $config = $this->getConfig($pool);
         $count = $config['pool']['connections'] ?? 1;

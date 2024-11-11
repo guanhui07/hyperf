@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\DB\Cases;
 
 use Hyperf\Config\Config;
@@ -18,12 +19,14 @@ use Hyperf\Contract\ConnectionInterface;
 use Hyperf\DB\Pool\Pool;
 use Hyperf\DB\Pool\PoolFactory;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use Psr\Container\ContainerInterface;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class CustomDriverTest extends AbstractTestCase
 {
     public function testCustomDriver()

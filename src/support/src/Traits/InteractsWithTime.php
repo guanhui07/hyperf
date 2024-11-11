@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Support\Traits;
 
 use Carbon\Carbon;
@@ -65,6 +66,22 @@ trait InteractsWithTime
      */
     protected function currentTime(): int
     {
+        return $this->currentTimestamp();
+    }
+
+    /**
+     * Get the current system time as a UNIX timestamp.
+     */
+    protected function currentTimestamp(): int
+    {
         return Carbon::now()->getTimestamp();
+    }
+
+    /**
+     * Get the current system time as a UNIX timestamp with milliseconds.
+     */
+    protected function currentTimestampMs(): float
+    {
+        return Carbon::now()->getPreciseTimestamp(3);
     }
 }

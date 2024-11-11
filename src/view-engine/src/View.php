@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\ViewEngine;
 
 use ArrayAccess;
@@ -22,10 +23,9 @@ use Hyperf\ViewEngine\Contract\EngineInterface;
 use Hyperf\ViewEngine\Contract\Htmlable;
 use Hyperf\ViewEngine\Contract\Renderable;
 use Hyperf\ViewEngine\Contract\ViewInterface;
-use Stringable;
 use Throwable;
 
-class View implements ArrayAccess, Htmlable, ViewInterface, Stringable
+class View implements ArrayAccess, Htmlable, ViewInterface
 {
     use Macroable {
         __call as macroCall;
@@ -134,7 +134,7 @@ class View implements ArrayAccess, Htmlable, ViewInterface, Stringable
      *
      * @throws Throwable
      */
-    public function render(callable $callback = null): array|string
+    public function render(?callable $callback = null): array|string
     {
         try {
             $contents = $this->renderContents();

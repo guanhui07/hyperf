@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Support\Reflection;
 
 use ReflectionClass;
@@ -26,16 +27,12 @@ class ClassInvoker
     {
         $property = $this->reflection->getProperty($name);
 
-        $property->setAccessible(true);
-
         return $property->getValue($this->instance);
     }
 
     public function __call($name, $arguments)
     {
         $method = $this->reflection->getMethod($name);
-
-        $method->setAccessible(true);
 
         return $method->invokeArgs($this->instance, $arguments);
     }

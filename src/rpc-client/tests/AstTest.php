@@ -9,17 +9,20 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace HyperfTest\RpcClient;
 
 use Hyperf\RpcClient\Proxy\Ast;
 use HyperfTest\RpcClient\Stub\FooInterface;
 use HyperfTest\RpcClient\Stub\ParInterface;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  * @coversNothing
  */
+#[CoversNothing]
 class AstTest extends TestCase
 {
     protected $license = '<?php

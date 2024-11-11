@@ -9,14 +9,15 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\RpcClient;
 
 use Hyperf\Coroutine\Locker;
-use Hyperf\Coroutine\Traits\Container;
 use Hyperf\Di\Annotation\ScanConfig;
 use Hyperf\RpcClient\Proxy\Ast;
 use Hyperf\RpcClient\Proxy\CodeLoader;
 use Hyperf\Support\Filesystem\Filesystem;
+use Hyperf\Support\Traits\Container;
 
 class ProxyFactory
 {
